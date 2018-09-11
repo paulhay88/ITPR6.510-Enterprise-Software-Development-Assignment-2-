@@ -45,7 +45,16 @@ func createTables(db *sql.DB) {
 			email VARCHAR(50),
 			password VARCHAR(20)
 		)`)
-
+	_, err = tx.Exec(`CREATE TABLE IF NOT EXISTS 
+		booking(
+			id SERIAL INT PRIMARY KEY, 
+			nameOfMeeting VARCHAR(20),
+			dateAndTime DATE(50), 
+			roomNumber VARCHAR(5), 
+			owner VARCHAR(20),
+			participants VARCHAR(20),
+			agenda VARCHAR(400)
+		)`)
 	// exec(tx, "CREATE TABLE IF NOT EXISTS companies(index INT PRIMARY KEY, company VARCHAR(50), staff_size INT, address VARCHAR(100), phone VARCHAR(20), email VARCHAR(50))")
 	// exec(tx, "CREATE TABLE IF NOT EXISTS interns(index SERIAL PRIMARY KEY, first_name VARCHAR(25), last_name VARCHAR(25), phone VARCHAR(20), email VARCHAR(50), company_id INT)")
 	// SERIAL use is postgres specific. Would usually be auto_increment
