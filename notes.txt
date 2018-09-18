@@ -1,3 +1,6 @@
+// Useful Resources:
+https://golang.org/doc/articles/wiki/
+
 Participants
 
 - 
@@ -32,13 +35,31 @@ Tables:
 
 - Pivot tables:
 - - Participants
-- - meetingID, usersID
+- - id, meetingID, usersID
 
 
 
 Functions:
+- Create meeting
+- Change meeting
+- Read and edit agenda
 - Find meeting
 - Analyse agendas
 - Create account
 - Login
-- 
+- Save User settings
+
+
+
+// TODO:
+- Server setup
+- Routing
+- Seed database
+
+- Functionality
+
+
+- Output data in json format
+- Possibly save agenda in different format. Json file(?). Database links to json file.
+
+- Read chapter 3 onwards

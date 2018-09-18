@@ -38,10 +38,8 @@ func createTables(db *sql.DB) {
 			topic VARCHAR(20),
 			dateAndTime TIMESTAMP, 
 			roomID VARCHAR(5), 
-			agenda VARCHAR(400),
+			agenda VARCHAR(1000),
 			ownerID INT REFERENCES users (id)
-			
-			
 		)`)
 	check(err)
 
