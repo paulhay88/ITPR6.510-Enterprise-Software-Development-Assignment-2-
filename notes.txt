@@ -1,0 +1,44 @@
+Participants
+
+- 
+
+Interaction roles:
+- read
+- write
+- owner
+
+Meetings
+- Date & time
+- room
+- topic
+- participants
+- agenda
+
+
+
+
+Tables:
+- Users
+- - id, name, email, phone, password
+- Rooms
+- - id, name
+- Meetings
+- - id, date & time, roomID, topic, agenda, ownerID
+- - participants will be own table and will be imported for info
+- PriorMeetings
+- - id, meetingID, userID
+- - once meeting is created it can be chosen as a template
+- - prior info will be gotten from meeting selected
+
+- Pivot tables:
+- - Participants
+- - meetingID, usersID
+
+
+
+Functions:
+- Find meeting
+- Analyse agendas
+- Create account
+- Login
+- 
