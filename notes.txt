@@ -52,9 +52,10 @@ Functions:
 
 
 // TODO:
-- Server setup
 - Routing
 - Cookies for login authentication
+- Login
+- Permissions
 
 - Functionality
 
@@ -65,6 +66,12 @@ Functions:
 - Read chapter 3 onwards
 
 
+// Routing:
+- Meetings, Rooms, users, priormeetings, participants
+- - Get
+- - Post - create new
+- - Put - update
+- - Delete
 
 ---------------
 
