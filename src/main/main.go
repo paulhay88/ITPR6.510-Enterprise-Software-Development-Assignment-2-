@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"net/http"
 
 	_ "github.com/lib/pq"
 )
@@ -16,6 +16,8 @@ func check(err error) {
 
 func main() {
 	// defer profile.Start().Stop()
+	router := &MyRouter{}
+	http.ListenAndServe(":9090", router)
 
 	meetingplannerdb := openDatabase()
 
@@ -24,24 +26,9 @@ func main() {
 
 	createTables(meetingplannerdb)
 
-	overview, err := meetingplannerdb.Query(`SELECT * FROM users`)
-	check(err)
+	seed(meetingplannerdb)
 
-	defer overview.Close()
-
-	for overview.Next() {
-		var (
-			name     string
-			phone    string
-			email    string
-			password string
-		)
-
-		err := overview.Scan(&name, &phone, &email, &password)
-		check(err)
-
-		fmt.Println(name, phone, email, password)
-	}
-
-	fmt.Println(meetingplannerdb)
+	// Display all data from all tables
+	testOverviews(meetingplannerdb)
+	// fmt.Println(meetingplannerdb)
 }
