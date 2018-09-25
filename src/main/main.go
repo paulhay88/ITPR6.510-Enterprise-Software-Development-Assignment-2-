@@ -1,8 +1,8 @@
 package main
 
 import (
+	"database/sql"
 	"log"
-	"net/http"
 
 	_ "github.com/lib/pq"
 )
@@ -14,13 +14,14 @@ func check(err error) {
 	}
 }
 
+var meetingplannerdb *sql.DB
+
 func main() {
 	// defer profile.Start().Stop()
 
-	meetingplannerdb := openDatabase()
+	meetingplannerdb = openDatabase()
 
-	router := &MyRouter{meetingplannerdb}
-	http.ListenAndServe(":9090", router)
+	route()
 
 	// Defer closing of database to end of main()
 	defer meetingplannerdb.Close()
