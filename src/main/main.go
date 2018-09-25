@@ -16,10 +16,11 @@ func check(err error) {
 
 func main() {
 	// defer profile.Start().Stop()
-	router := &MyRouter{}
-	http.ListenAndServe(":9090", router)
 
 	meetingplannerdb := openDatabase()
+
+	router := &MyRouter{meetingplannerdb}
+	http.ListenAndServe(":9090", router)
 
 	// Defer closing of database to end of main()
 	defer meetingplannerdb.Close()
@@ -30,5 +31,4 @@ func main() {
 
 	// Display all data from all tables
 	testOverviews(meetingplannerdb)
-	// fmt.Println(meetingplannerdb)
 }

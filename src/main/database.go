@@ -13,7 +13,7 @@ func testOverviews(meetingplannerdb *sql.DB) {
 
 	defer users.Close()
 
-	fmt.Println("Users: \n ")
+	fmt.Println("\nUsers: \n")
 
 	for users.Next() {
 		var (
@@ -35,7 +35,7 @@ func testOverviews(meetingplannerdb *sql.DB) {
 
 	defer rooms.Close()
 
-	fmt.Println("Rooms: \n ")
+	fmt.Println("\nRooms: \n")
 
 	for rooms.Next() {
 		var (
@@ -54,7 +54,7 @@ func testOverviews(meetingplannerdb *sql.DB) {
 
 	defer meetings.Close()
 
-	fmt.Println("Meetings: \n ")
+	fmt.Println("\nMeetings: \n")
 
 	for meetings.Next() {
 		var (
@@ -77,7 +77,7 @@ func testOverviews(meetingplannerdb *sql.DB) {
 
 	defer priorMeetings.Close()
 
-	fmt.Println("PriorMeetings: \n ")
+	fmt.Println("\nPriorMeetings: \n")
 
 	for priorMeetings.Next() {
 		var (
@@ -97,7 +97,7 @@ func testOverviews(meetingplannerdb *sql.DB) {
 
 	defer participants.Close()
 
-	fmt.Println("Participants: \n ")
+	fmt.Println("\nParticipants: \n")
 
 	for participants.Next() {
 		var (
@@ -180,11 +180,6 @@ func createTables(db *sql.DB) {
 	tx.Commit()
 }
 
-//
-// func init() {
-//     rand.Seed(time.Now().UnixNano())
-// }
-
 // Random letter seeder
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
@@ -206,19 +201,19 @@ func seed(db *sql.DB) {
 		// Users seed
 		_, err = tx.Exec(`INSERT INTO 
 		users(name, phone, email, password) VALUES(
-			$1, $2, $3, $4)`, randStr(15), randStr(15), randStr(15), randStr(15))
+			$1, $2, $3, $4)`, "NAME_"+randStr(10), "PHONE_"+randStr(10), "EMAIL_"+randStr(10), "PASSWORD_"+randStr(10))
 		check(err)
 
 		// Rooms seed
 		_, err = tx.Exec(`INSERT INTO
 		rooms(name) VALUES(
-			$1)`, randStr(15))
+			$1)`, "NAME_"+randStr(10))
 		check(err)
 
 		// Meetings seed
 		_, err = tx.Exec(`INSERT INTO
 		meetings(topic, dateAndTime, agenda, roomID, ownerID) VALUES(
-			$1, $2, $3, $4, $5)`, randStr(15), "2001-09-28 01:00", randStr(15), i, 1)
+			$1, $2, $3, $4, $5)`, "TOPIC_"+randStr(10), "2001-09-28 01:00", "AGENDA_"+randStr(10), i, 1)
 		check(err)
 
 		// PriorMeetings seed
