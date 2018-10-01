@@ -1,67 +1,62 @@
 package main
 
+import "time"
+
 // Users array
 type Users struct {
-	users []User `json:"users"`
+	Users []User `json:"users"`
 }
 
 // User details
 type User struct {
-	id       int    `json:"id`
-	name     string `json:"name"`
-	phone    string `json:"phone"`
-	email    string `json:"email"`
-	password string `json:"password"`
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	Phone    string `json:"phone"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 // Rooms array
 type Rooms struct {
-	rooms []Room `json:"rooms"`
+	Rooms []Room `json:"rooms"`
 }
 
 // Room details
 type Room struct {
-	id   int    `json:"id`
-	name string `json:"name"`
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 // PriorMeetings array
 type PriorMeetings struct {
-	priorMeetings []PriorMeeting `json:"priorMeetings"`
+	PriorMeetings []PriorMeeting `json:"priorMeetings"`
 }
 
 // PriorMeeting references
 type PriorMeeting struct {
-	id        int `json:"id`
-	meetingID int `json:"meetinID`
-	userID    int `json:"userID`
+	ID        int `json:"id"`
+	MeetingID int `json:"meetingID"`
+	UserID    int `json:"userID"`
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> a7c0e4720b67965ef1f5d3401df176c1f1bd0450
 type Meetings struct {
-	meeting []Meeting `json:"meeting"`
+	Meeting []Meeting `json:"meeting"`
 }
- type Meeting struct { 
-	meetingID int `json:"meetingID"`
-	timeAndDate time.Time `json:"timeAndDate"`
-	roomName string `json:"roomName"`
-	topic string `json:"topic"`
-	agenda string `json:"agenda"`
-	owner string `json:"owner"`
-	participants string `json:"participant"`
-		
- }
+type Meeting struct {
+	ID          int       `json:"id"`
+	TimeAndDate time.Time `json:"timeAndDate"`
+	RoomID      int       `json:"roomID"`
+	Topic       string    `json:"topic"`
+	Agenda      string    `json:"agenda"`
+	OwnerID     int       `json:"ownerID"`
+}
 
 type Partipants struct {
-	Partipants []Participant `json:"Participants"`
+	Partipants []Participant `json:"participants"`
 }
 type Participant struct {
-	name string `json:"name"`
-	meetingID int `json:"meetingID"`
-	userID int `json:"userID"`
-	ownerID int `json:"owner"`
-
+	Name      string `json:"name"`
+	MeetingID int    `json:"meetingID"`
+	UserID    int    `json:"userID"`
+	OwnerID   int    `json:"owner"`
 }
