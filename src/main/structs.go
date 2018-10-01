@@ -37,11 +37,8 @@ type PriorMeeting struct {
 	userID    int `json:"userID`
 }
 
-
-
-
 type Meetings struct {
-	meeting array[] 
+	meetings []Meeting
 }
  type Meeting struct { 
 	MeetingID int
