@@ -40,7 +40,7 @@ type PriorMeeting struct {
 }
 
 type Meetings struct {
-	Meeting []Meeting `json:"meeting"`
+	Meetings []Meeting `json:"meeting"`
 }
 type Meeting struct {
 	ID          int       `json:"id"`
