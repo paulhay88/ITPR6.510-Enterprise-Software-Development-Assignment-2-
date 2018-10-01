@@ -37,7 +37,10 @@ type PriorMeeting struct {
 	userID    int `json:"userID`
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> a7c0e4720b67965ef1f5d3401df176c1f1bd0450
 type Meetings struct {
 	meeting array[] `json:"meeting"`
 }
