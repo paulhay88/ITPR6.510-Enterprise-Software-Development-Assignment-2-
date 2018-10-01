@@ -10,7 +10,11 @@ import (
 
 func route() {
 	router := httprouter.New()
-
+	router.Handle("/", getHandler).Methods("GET")
+	router.Handle("/", postHandler).Methods("POST")
+	router.Handle("/", puthandler).Methods("PUT")
+	router.handle("/", deletehandle).Methods("DELETE")
+	http.Handle("/", router)
 	router.GET("/", getMeetings)
 	log.Fatal(http.ListenAndServe(":9090", router))
 }
