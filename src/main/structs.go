@@ -38,29 +38,27 @@ type PriorMeeting struct {
 }
 
 
-
-
 type Meetings struct {
-	meeting array[] `json:meeting`
+	meeting array[] `json:"meeting"`
 }
  type Meeting struct { 
-	MeetingID int `json:MeetingID`
-	TimeAndDate time.Time `json:TimeAndDate`
-	RoomName string `json:RoomName`
-	Topic string `json:Topic`
-	Agenda string `json:Agenda`
-	Owner string `json:Owner`
-	Participants string `json:Participant`
+	meetingID int `json:"meetingID"`
+	timeAndDate time.Time `json:"timeAndDate"`
+	roomName string `json:"roomName"`
+	topic string `json:"topic"`
+	agenda string `json:"agenda"`
+	owner string `json:"owner"`
+	participants string `json:"participant"`
 		
  }
 
 type Partipants struct {
-	Partipants array[] `json:Participants`
+	Partipants array[] `json:"Participants"`
 }
 type Participant struct {
-	Name string `json:Name`
-	MeetingID int `json:MeetingID`
-	UserID int `json:UserID`
-	OwnerID int `json:Owner`
+	name string `json:"name"`
+	meetingID int `json:"meetingID"`
+	userID int `json:"userID"`
+	ownerID int `json:"owner"`
 
 }
