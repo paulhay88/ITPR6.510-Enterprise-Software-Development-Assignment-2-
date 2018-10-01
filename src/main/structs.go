@@ -42,7 +42,7 @@ type PriorMeeting struct {
 =======
 >>>>>>> a7c0e4720b67965ef1f5d3401df176c1f1bd0450
 type Meetings struct {
-	meeting array[] `json:"meeting"`
+	meeting []Meeting `json:"meeting"`
 }
  type Meeting struct { 
 	meetingID int `json:"meetingID"`
@@ -56,7 +56,7 @@ type Meetings struct {
  }
 
 type Partipants struct {
-	Partipants array[] `json:"Participants"`
+	Partipants []Participant `json:"Participants"`
 }
 type Participant struct {
 	name string `json:"name"`
