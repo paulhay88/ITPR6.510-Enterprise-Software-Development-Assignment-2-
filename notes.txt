@@ -53,6 +53,7 @@ Functions:
 
 // TODO:
 - Routing
+- Create functionality
 - Cookies for login authentication
 - Login
 - Permissions
