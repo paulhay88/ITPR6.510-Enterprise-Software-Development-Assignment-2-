@@ -43,20 +43,20 @@ type Meetings struct {
 	Meetings []Meeting `json:"meetings"`
 }
 type Meeting struct {
-	ID          int       `json:"id"`
-	TimeAndDate time.Time `json:"timeAndDate"`
-	RoomID      int       `json:"roomID"`
-	Topic       string    `json:"topic"`
-	Agenda      string    `json:"agenda"`
-	OwnerID     int       `json:"ownerID"`
+	ID           int       `json:"id"`
+	TimeAndDate  time.Time `json:"timeAndDate"`
+	RoomID       int       `json:"roomID"`
+	Topic        string    `json:"topic"`
+	Agenda       string    `json:"agenda"`
+	OwnerID      int       `json:"ownerID"`
+	Participants []User
 }
 
-type Partipants struct {
+type Participants struct {
 	Partipants []Participant `json:"participants"`
 }
 type Participant struct {
-	Name      string `json:"name"`
-	MeetingID int    `json:"meetingID"`
-	UserID    int    `json:"userID"`
-	OwnerID   int    `json:"owner"`
+	ID        int `json:"id"`
+	MeetingID int `json:"meetingID"`
+	UserID    int `json:"userID"`
 }
