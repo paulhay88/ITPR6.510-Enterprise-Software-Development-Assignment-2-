@@ -85,6 +85,47 @@ localhost:9090/
 
 ---------------
 
+Meeting Planner Routing:
+
+/login
+/signup
+Validate users and passwords 
+	Create cookies
+
+Pass login, username and password in json format - POST
+Check and redirect  
+Overview:
+/  
+/:meetingID
+
+
+Users:
+/users/create // same as signup
+/users/:id/settings
+
+Rooms:
+
+Meeting:
+/meeting/create
+/meeting/:id/edit  //all fields available in Form to edit same page with greyed out info for participants that cant change time or date
+/meeting/search
+/meeting/results
+Meeting topic
+Participants
+Agenda	
+
+
+Database struct
+	
+
+Data flow:
+
+Database => struct => json => output
+Input => json => struct => database
+
+
+--------
+
 Useful information:
 
 "There are many methods you can use to communicate with servers in HTTP; GET, POST, PUT and DELETE are the 4 basic methods that we typically use. A URL represents a resource on a network, so these 4 methods define the query, change, add and delete operations that can act on these resources. GET and POST are very commonly used in HTTP. GET can append query parameters to the URL, using ? to separate the URL and parameters and & between the arguments, like EditPosts.aspx?name=test1&id=123456. POST puts data in the request body because the URL implements a length limitation via the browser. Thus, POST can submit much more data than GET. Also, when we submit user names and passwords, we don't want this kind of information to appear in the URL, so we use POST to keep them invisible."
@@ -107,3 +148,17 @@ Difference between post and put:
 - Put is idempotent. Will create or overwrite any resource.
 
 - Both can be used to modify or create. Idempotency should be kept in mind.
+
+---------------------------------
+
+Workload split up:
+
+Paul
+- Find a meeting
+- Analyse agendas
+- Login
+
+Kassian
+- Read and/or edit agenda
+- Change booking
+- User settings
