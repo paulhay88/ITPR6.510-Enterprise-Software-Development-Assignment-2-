@@ -2,6 +2,10 @@ package main
 
 import "time"
 
+// Output interface
+type Output interface {
+}
+
 // Users array
 type Users struct {
 	Users []User `json:"users"`
@@ -44,7 +48,7 @@ type Meetings struct {
 }
 type Meeting struct {
 	ID          int       `json:"id"`
-	TimeAndDate time.Time `json:"timeAndDate"`
+	TimeAndDate time.Time `json:"dateAndTime"`
 	RoomID      int       `json:"roomID"`
 	Topic       string    `json:"topic"`
 	Agenda      string    `json:"agenda"`
