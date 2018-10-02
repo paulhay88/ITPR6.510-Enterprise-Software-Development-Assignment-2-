@@ -40,7 +40,11 @@ type PriorMeeting struct {
 }
 
 type Meetings struct {
+<<<<<<< HEAD
 	Meetings []Meeting `json:"meeting"`
+=======
+	Meetings []Meeting `json:"meetings"`
+>>>>>>> e2d94431138225bddeb2b69e882a505fdd47ca23
 }
 type Meeting struct {
 	ID          int       `json:"id"`
