@@ -48,9 +48,14 @@ func routeLog() {
 				validatation here and proceed to create cookie
 				setting a cookie:
 				*/
+				
 				expiration := time.Now().Add(365 * 24 * time.Hour)
 				cookie := http.Cookie{Name: user.Name, Value: user.Password, Expires: expiration, Secure: true}
 				http.SetCookie(w, &cookie)
+				for	_, cookie := range r.Cookies(){  //new variable should change ? 
+					
+					fmt.Fprint(w, cookie.Name)
+					}
 				message = "User Accepted"
 				http.Redirect(w, r, "/", http.StatusFound)
 			}
