@@ -1,4 +1,5 @@
 package	main
+
 import (
 	"encoding/json"
 	"fmt"
@@ -7,7 +8,10 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 )
-
+type LogInUser struct {
+	userName string 
+	password string
+}
 func routeLog() {
 	router := httprouter.New()
 	router.GET("/login/", validateUser)
@@ -25,12 +29,9 @@ func routeLog() {
 	check(err)
 
 	}
-	type LogInUser struct {
-		userName string 
-		password string
-	}
+	
 
-	func validateUser(w http.ResponseWriter, r *http.Request,  _ httprouter.Params){
+func validateUser(w http.ResponseWriter, r *http.Request,  _ httprouter.Params){
 
 		var checkUser Users
 		var logInUser logInUser
@@ -53,9 +54,9 @@ func routeLog() {
 				cookie := http.Cookie{Name: user.Name, Value: user.Password, Expires: expiration, Secure: true}
 				http.SetCookie(w, &cookie)
 				for	_, cookie := range r.Cookies(){  //new variable should change ? 
-					
+
 					fmt.Fprint(w, cookie.Name)
-					}
+					} //should return cookies 
 				message = "User Accepted"
 				http.Redirect(w, r, "/", http.StatusFound)
 			}
