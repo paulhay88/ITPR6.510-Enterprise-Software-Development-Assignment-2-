@@ -12,10 +12,19 @@ import (
 func route() {
 	router := httprouter.New()
 
+	// Meetings
 	router.GET("/", getMeetings)
 	router.POST("/meeting/create", createMeeting)
-	router.PUT("/meeting/edit/:id", updateMeeting)
-	router.DELETE("/meeting/delete/:id", deleteMeeting)
+	router.PUT("/meeting/:id/edit", updateMeeting)
+	router.DELETE("/meeting/:id/delete", deleteMeeting)
+
+	// Users
+
+	// User settings
+	router.GET("/users/:id/settings", getUserSettings)
+	router.POST("/users/:id/settings/create", createUserSettings)
+	router.PUT("/users/:id/settings/edit", updateUserSettings)
+	router.DELETE("/users/:id/settings/delete", deleteUserSettings)
 
 	// Testing
 	router.POST("/outputInput", outputInput)
