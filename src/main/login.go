@@ -58,7 +58,7 @@ func validateUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		output(w, "Computer says 'No'.")
 	} else {
 		expiration := time.Now().Add(1 * 24 * time.Hour)
-		cookie := http.Cookie{Name: user.UserName, Value: user.Password, Expires: expiration}
+		cookie := http.Cookie{Name: "Cookie", Value: user.UserName + ":" + user.Password, Expires: expiration}
 		http.SetCookie(w, &cookie)
 
 		for _, cookie := range r.Cookies() {
