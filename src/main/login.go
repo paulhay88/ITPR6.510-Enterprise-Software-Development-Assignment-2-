@@ -1,9 +1,8 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -11,88 +10,62 @@ import (
 )
 
 type LogInUser struct {
-	userName string
-	password string
+	UserName string `json:"userName"`
+	Password string `json:"password"`
 }
 
-func routeLog() {
-	router := httprouter.New()
-	router.GET("/login/", validateUser)
-	router.POST("/", createUser)
-	log.Fatal(http.ListenAndServe(":9090", router))
-}
 func createUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var user = new(User)
 	err := json.NewDecoder(r.Body).Decode(&user)
 	check(err)
 
-	_, err = meetingplannerdb.Exec(
-		`INSERT INTO users(name, phone, email, password) VALUES($1, $2, $3, $4)`,
-		user.Name, user.Phone, user.Email, user.Password)
-	check(err)
+	userRow := meetingplannerdb.QueryRow(`SELECT * FROM users WHERE userName=$1`, user.UserName)
+
+	err = userRow.Scan(&user.ID, &user.UserName, &user.Name, &user.Phone, &user.Email, &user.Password)
+
+	// Check if username already exists
+	if err == sql.ErrNoRows {
+		http.Redirect(w, r, "/signup", http.StatusUnauthorized)
+		output(w, "Username already exists, please choose a different one.")
+	} else {
+
+		// Create new user
+		_, err = meetingplannerdb.Exec(
+			`INSERT INTO users(name, userName, phone, email, password) VALUES($1, $2, $3, $4, $5)`,
+			user.Name, user.UserName, user.Phone, user.Email, user.Password)
+		check(err)
+	}
 
 }
 
 func validateUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
-	var user LogInUser
 	var logInUser LogInUser
 
-	users, err := meetingplannerdb.Query(`SELECT * FROM users`)
+	err := json.NewDecoder(r.Body).Decode(&logInUser)
 	check(err)
-	defer users.Close()
-	err = json.NewDecoder(r.Body).Decode(&user)
-	for users.Next() {
-		var user User
-		err := users.Scan(&user.Name, &user.Phone, &user.Email, &user.Password)
-		check(err)
-		//coompare
-		if user.Name == logInUser.userName && user.Password == logInUser.password {
-			/*
-				validatation here and proceed to create cookie
-				setting a cookie:
-			*/
 
-			expiration := time.Now().Add(365 * 24 * time.Hour)
-			cookie := http.Cookie{Name: user.Name, Value: user.Password, Expires: expiration, Secure: true}
-			http.SetCookie(w, &cookie)
-			for _, cookie := range r.Cookies() { //new variable should change ?
+	// Get user with the POSTed details
+	userRow := meetingplannerdb.QueryRow(`SELECT * FROM users WHERE userName=$1 AND password=$2`, logInUser.UserName, logInUser.Password)
 
-				fmt.Fprint(w, cookie.Name)
-			} //should return cookies
-			// message := "User Accepted"
-			http.Redirect(w, r, "/", http.StatusFound)
-		} else {
-			// message := "User Not accepted"
-			http.Redirect(w, r, "/login/", http.StatusFound)
+	var user User
+
+	err = userRow.Scan(&user.ID, &user.UserName, &user.Name, &user.Phone, &user.Email, &user.Password)
+
+	// Check if user exists
+	if err == sql.ErrNoRows {
+		http.Redirect(w, r, "/signup", http.StatusUnauthorized)
+		output(w, "Computer says 'No'.")
+	} else {
+		expiration := time.Now().Add(1 * 24 * time.Hour)
+		cookie := http.Cookie{Name: user.UserName, Value: user.Password, Expires: expiration}
+		http.SetCookie(w, &cookie)
+
+		for _, cookie := range r.Cookies() {
+
+			output(w, cookie.Name)
+			output(w, cookie.Value)
 		}
-
 	}
+
 }
-
-//COOKIES
-/*
-	http.SetCookie(w ResponseWriter, cookie *Cookie)
-	type Cookie struct {
-	    Name       string
-	    Value      string
-	    Path       string
-	    Domain     string
-	    Expires    time.Time
-	    RawExpires string
-	    MaxAge   int
-	    Secure   bool
-	    HttpOnly bool
-	    Raw      string
-	    Unparsed []string // Raw text of unparsed attribute-value pairs
-	}
-*/
-//get a cookie that has been set
-//cookie, _ := r.Cookie("username")
-//fmt.Fprint(w, cookie)
-//Here is another way to get a cookie
-/*
-	for _, cookie := range r.Cookies() {
-	    fmt.Fprint(w, cookie.Name)
-	}
-*/

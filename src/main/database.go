@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -136,6 +137,7 @@ func createTables(db *sql.DB) {
 	_, err = tx.Exec(`CREATE TABLE IF NOT EXISTS 
 		users (
 			id SERIAL PRIMARY KEY,
+			userName VARCHAR(50),
 			name VARCHAR(50), 
 			phone VARCHAR(20), 
 			email VARCHAR(50),
@@ -198,10 +200,10 @@ func seed(db *sql.DB) {
 
 	for i := 1; i < 11; i++ {
 
-		// Users seed
+		// Test users
 		_, err = tx.Exec(`INSERT INTO 
-		users(name, phone, email, password) VALUES(
-			$1, $2, $3, $4)`, "NAME_"+randStr(10), "PHONE_"+randStr(10), "EMAIL_"+randStr(10), "PASSWORD_"+randStr(10))
+		users(name, userName, phone, email, password) VALUES(
+			$1, $2, $3, $4, $5)`, "PHONE_"+randStr(10), "test"+strconv.Itoa(i), "PHONE_"+randStr(10), "EMAIL_"+randStr(10), "password"+strconv.Itoa(i))
 		check(err)
 
 		// Rooms seed

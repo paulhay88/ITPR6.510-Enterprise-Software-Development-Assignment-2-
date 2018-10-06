@@ -15,11 +15,6 @@ func route() {
 	// Meetings
 	router.GET("/", getMeetings)
 	router.POST("/meeting/create", createMeeting)
-<<<<<<< HEAD
-
-	router.PUT("/meeting/edit/:id", updateMeeting)
-	router.DELETE("/meeting/delete/:id", deleteMeeting)
-=======
 	router.PUT("/meeting/:id/edit", updateMeeting)
 	router.DELETE("/meeting/:id/delete", deleteMeeting)
 
@@ -30,16 +25,17 @@ func route() {
 	router.POST("/users/:id/settings/create", createUserSettings)
 	router.PUT("/users/:id/settings/edit", updateUserSettings)
 	router.DELETE("/users/:id/settings/delete", deleteUserSettings)
->>>>>>> 9ea6d639422ec33fd2f95961ccf4a65d4763fa50
-
-	// Testing
-	router.POST("/outputInput", outputInput)
-	log.Fatal(http.ListenAndServe(":9090", router))
 
 	// Login
-	router.GET("/login/", _)
-	router.GET("/login/:id", login)
-	router.POST("/createUser/", createUser)
+	router.POST("/signup", createUser)
+	router.POST("/login", validateUser)
+	// router.GET("/login/:id", login)
+	// router.POST("/createUser/", createUser)
+
+	// Testing
+	router.GET("/getCookies", getCookies)
+	router.POST("/outputInput", outputInput)
+	log.Fatal(http.ListenAndServe(":9090", router))
 
 }
 

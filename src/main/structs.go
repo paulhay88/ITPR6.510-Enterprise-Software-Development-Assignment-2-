@@ -10,6 +10,7 @@ type Users struct {
 // User details
 type User struct {
 	ID       int    `json:"id"`
+	UserName string `json:"userName"`
 	Name     string `json:"name"`
 	Phone    string `json:"phone"`
 	Email    string `json:"email"`
