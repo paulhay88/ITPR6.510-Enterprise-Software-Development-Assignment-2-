@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -17,8 +16,6 @@ func getMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	check(err)
 
 	defer meetings.Close()
-
-	fmt.Fprintf(w, "\nMeetings: \n")
 
 	for meetings.Next() {
 

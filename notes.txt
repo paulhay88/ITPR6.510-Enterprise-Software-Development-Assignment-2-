@@ -162,3 +162,22 @@ Kassian
 - Read and/or edit agenda
 - Change booking
 - User settings
+
+
+--- 
+
+Notes for tomorrow:
+
+if else statements.
+else needs to look like this:
+if {
+} else {
+}
+
+other main was interfering.
+
+a few variables didn't exist anymore. git merge conflict i think.
+
+a few mix ups of variables.
+
+overall logic was there, just execution got mixed up.
