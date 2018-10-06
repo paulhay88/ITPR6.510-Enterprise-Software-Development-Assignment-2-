@@ -14,12 +14,19 @@ func route() {
 
 	router.GET("/", getMeetings)
 	router.POST("/meeting/create", createMeeting)
+
 	router.PUT("/meeting/edit/:id", updateMeeting)
 	router.DELETE("/meeting/delete/:id", deleteMeeting)
 
 	// Testing
 	router.POST("/outputInput", outputInput)
 	log.Fatal(http.ListenAndServe(":9090", router))
+
+	// Login
+	router.GET("/login/", _)
+	router.GET("/login/:id", login)
+	router.POST("/createUser/", createUser)
+
 }
 
 // Turn struct
