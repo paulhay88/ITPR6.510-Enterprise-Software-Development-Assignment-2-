@@ -10,7 +10,9 @@ import (
 )
 
 func route() {
+
 	router := httprouter.New()
+	// auth := Authenticate{router}
 
 	// Meetings
 	router.GET("/", getMeetings)
@@ -33,9 +35,8 @@ func route() {
 	// router.POST("/createUser/", createUser)
 
 	// Testing
-	router.GET("/getCookies", getCookies)
 	router.POST("/outputInput", outputInput)
-	log.Fatal(http.ListenAndServe(":9090", router))
+	log.Fatal(http.ListenAndServe(":9090", auth(router)))
 
 }
 
@@ -56,3 +57,18 @@ func outputInput(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	output(w, inter)
 }
+
+// Middleware
+
+func auth(router *httprouter.Router) *httprouter.Router {
+
+	// authRouter := httprouter.New()
+
+	// authRouter.GET("/", authenticate)
+
+	fmt.Println("test")
+
+	return router
+}
+
+// func authenticate()
