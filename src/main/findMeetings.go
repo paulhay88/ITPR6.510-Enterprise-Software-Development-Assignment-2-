@@ -1,12 +1,11 @@
 package main
 
 import (
-	"os/user"
 	"encoding/json"
 	"net/http"
-
-	"github.com/julienschmidt/httprouter"
+	"time"
 )
+
 type FindMeeting struct {
 	ID           int       `json:"id"`
 	TimeAndDate  time.Time `json:"timeAndDate"`
@@ -22,11 +21,15 @@ func findMeeting(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&findMeeting)
 	check(err)
 	//get cookie
-	http.GetCookie(r, &cookie)
-	for _, cookie := range r.Cookies() {
-		if cookie.Name == user.Name{
-		output(w, cookie.Name)
-		//get Meeeting 
+	/*
+	   cookie, _ := r.Cookie("username")
+	   	fmt.Fprint(w, cookie)
+	*/
+	cookie, _ := r.Cookie("Name")
+
+	output(w, cookie.Name)
+	/*
+		//get Meeeting
 		aMeeting := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE ownerID=$1`, user.UserID)
 		result = foundMeeting.Scan(&id, &dateAndTime, &roomID, &topic, &agenda, &ownerID, &participants)
 		if result == sql.ErrNoRows {
@@ -35,16 +38,13 @@ func findMeeting(w http.ResponseWriter, r *http.Request) {
 			output(w, result)
 		}
 
-	}
+	*/
 }
 
-
-
-
 /*
-		 roomID = $1, 
-			 topic = $2, 
-			 agenda = $3, 
-			 ownerID = $4,
-			 dateAndTime = $5
+	 roomID = $1,
+		 topic = $2,
+		 agenda = $3,
+		 ownerID = $4,
+		 dateAndTime = $5
 */
