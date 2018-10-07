@@ -58,14 +58,16 @@ func validateUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		output(w, "Computer says 'No'.")
 	} else {
 		expiration := time.Now().Add(1 * 24 * time.Hour)
-		cookie := http.Cookie{Name: "Cookie", Value: user.UserName + ":" + user.Password, Expires: expiration}
+		cookie := http.Cookie{Name: "authUser", Value: user.UserName + ":" + user.Password, Expires: expiration}
 		http.SetCookie(w, &cookie)
 
-		for _, cookie := range r.Cookies() {
+		// newCookie, _ := r.Cookie("authUser")
 
-			output(w, cookie.Name)
-			output(w, cookie.Value)
-		}
+		// userName := strings.Split(newCookie.Value, ":")[0]
+		// password := strings.Split(newCookie.Value, ":")[1]
+
+		// output(w, userName)
+		// output(w, password)
 	}
 
 }

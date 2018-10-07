@@ -48,7 +48,7 @@ func getMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 				var user User
 				var localPass string // keep password safe
 
-				err := users.Scan(&user.ID, &user.Name, &user.Email, &user.Phone, &localPass)
+				err := users.Scan(&user.ID, &user.UserName, &user.Name, &user.Email, &user.Phone, &localPass)
 				check(err)
 
 				meeting.Participants = append(meeting.Participants, user)
