@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -36,7 +37,7 @@ func route() {
 
 	// Testing
 	router.POST("/outputInput", outputInput)
-	log.Fatal(http.ListenAndServe(":9090", auth(router)))
+	log.Fatal(http.ListenAndServe(":9090", authenticate(router)))
 
 }
 
@@ -60,15 +61,23 @@ func outputInput(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 // Middleware
 
-func auth(router *httprouter.Router) *httprouter.Router {
+func auth(next httprouter.Handle) httprouter.Handle {
 
-	// authRouter := httprouter.New()
+	return func(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
-	// authRouter.GET("/", authenticate)
+		cookie, _ := r.Cookie("authUser")
 
-	fmt.Println("test")
+		userName := strings.Split(cookie.Value, ":")[0]
+		password := strings.Split(cookie.Value, ":")[1]
+
+		output(w, userName)
+		output(w, password)
+
+		next(w, r, params)
+	}
+}
+
+func authenticate(router *httprouter.Router) *httprouter.Router {
 
 	return router
 }
-
-// func authenticate()
