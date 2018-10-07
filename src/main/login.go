@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
@@ -12,6 +13,32 @@ import (
 type LogInUser struct {
 	UserName string `json:"userName"`
 	Password string `json:"password"`
+}
+
+// Is user logged in
+func loggedIn(w http.ResponseWriter, r *http.Request, _ httprouter.Params) bool {
+
+	cookie, err := r.Cookie("authUser")
+
+	if err != nil {
+		return false
+	}
+
+	userName := strings.Split(cookie.Value, ":")[0]
+	password := strings.Split(cookie.Value, ":")[1]
+
+	userRow := meetingplannerdb.QueryRow(`SELECT * FROM users WHERE userName=$1 AND password=$2`, userName, password)
+
+	var user User
+
+	err = userRow.Scan(&user.ID, &user.UserName, &user.Name, &user.Phone, &user.Email, &user.Password)
+
+	// Check if user exists
+	if err != sql.ErrNoRows {
+		return true
+	}
+
+	return false
 }
 
 func createUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -38,9 +65,14 @@ func createUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 }
 
-func validateUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	var logInUser LogInUser
+
+	if loggedIn(w, r, nil) {
+		output(w, "User is already logged in.")
+		return
+	}
 
 	err := json.NewDecoder(r.Body).Decode(&logInUser)
 	check(err)
@@ -54,20 +86,29 @@ func validateUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	// Check if user exists
 	if err == sql.ErrNoRows {
-		http.Redirect(w, r, "/signup", http.StatusUnauthorized)
-		output(w, "Computer says 'No'.")
+		output(w, "Your username or password was incorrect. Please try again.")
 	} else {
 		expiration := time.Now().Add(1 * 24 * time.Hour)
 		cookie := http.Cookie{Name: "authUser", Value: user.UserName + ":" + user.Password, Expires: expiration}
 		http.SetCookie(w, &cookie)
-
-		// newCookie, _ := r.Cookie("authUser")
-
-		// userName := strings.Split(newCookie.Value, ":")[0]
-		// password := strings.Split(newCookie.Value, ":")[1]
-
-		// output(w, userName)
-		// output(w, password)
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 
+}
+
+func logout(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
+	if !loggedIn(w, r, nil) {
+		output(w, "User is already logged out.")
+		return
+	}
+
+	cookie := http.Cookie{Name: "authUser", Value: ":"}
+	http.SetCookie(w, &cookie)
+	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+func loginPage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
+	output(w, "Please login.")
 }
