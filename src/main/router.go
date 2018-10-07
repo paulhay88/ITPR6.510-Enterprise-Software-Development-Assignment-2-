@@ -5,15 +5,31 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/urfave/negroni"
 )
 
 func route() {
 
 	router := httprouter.New()
-	// auth := Authenticate{router}
+
+	mux := http.NewServeMux()
+
+	mux.Handle("/login", router)
+	mux.Handle("/signup", router)
+	mux.Handle("/", negroni.New(
+		negroni.HandlerFunc(auth),
+		negroni.Wrap(router),
+	))
+
+	// Login
+	router.POST("/signup", createUser)
+	router.GET("/login", loginPage)
+	router.POST("/login", login)
+	router.GET("/logout", logout)
+	// router.GET("/login/:id", login)
+	// router.POST("/createUser/", createUser)
 
 	// Meetings
 	router.GET("/", getMeetings)
@@ -29,15 +45,12 @@ func route() {
 	router.PUT("/users/:id/settings/edit", updateUserSettings)
 	router.DELETE("/users/:id/settings/delete", deleteUserSettings)
 
-	// Login
-	router.POST("/signup", createUser)
-	router.POST("/login", validateUser)
-	// router.GET("/login/:id", login)
-	// router.POST("/createUser/", createUser)
-
 	// Testing
 	router.POST("/outputInput", outputInput)
-	log.Fatal(http.ListenAndServe(":9090", authenticate(router)))
+
+	n := negroni.Classic()
+	n.UseHandler(mux)
+	log.Fatal(http.ListenAndServe(":9090", n))
 
 }
 
@@ -61,23 +74,28 @@ func outputInput(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 // Middleware
 
-func auth(next httprouter.Handle) httprouter.Handle {
+func auth(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
-	return func(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-
-		cookie, _ := r.Cookie("authUser")
-
-		userName := strings.Split(cookie.Value, ":")[0]
-		password := strings.Split(cookie.Value, ":")[1]
-
-		output(w, userName)
-		output(w, password)
-
-		next(w, r, params)
+	if loggedIn(w, r, nil) {
+		next(w, r)
+	} else {
+		http.Redirect(w, r, "/login", http.StatusFound)
 	}
 }
 
-func authenticate(router *httprouter.Router) *httprouter.Router {
+// Single wrapper authentication
+// func auth(next httprouter.Handle) httprouter.Handle {
 
-	return router
-}
+// 	return func(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+
+// 		cookie, _ := r.Cookie("authUser")
+
+// 		userName := strings.Split(cookie.Value, ":")[0]
+// 		password := strings.Split(cookie.Value, ":")[1]
+
+// 		output(w, userName)
+// 		output(w, password)
+
+// 		next(w, r, params)
+// 	}
+// }
