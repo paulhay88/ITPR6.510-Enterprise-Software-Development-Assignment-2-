@@ -103,6 +103,7 @@ func logout(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		return
 	}
 
+	// Set cookie to null values
 	cookie := http.Cookie{Name: "authUser", Value: ":"}
 	http.SetCookie(w, &cookie)
 	http.Redirect(w, r, "/", http.StatusFound)

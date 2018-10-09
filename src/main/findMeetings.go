@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -30,33 +29,46 @@ func findOwnedMeeting(w http.ResponseWriter, r *http.Request, httprouter.Params)
 	}
 }
 */
-func findMyParticipantMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	meetingCookie := r.Cokkie("authUser")
+func findUsersMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	meetingCookie, err := r.Cookie("authUser")
+	check(err)
+
 	meetings := new(Meetings)
 	user := new(User)
+
 	userName := strings.Split(meetingCookie.Value, ":")[0]
+
 	userID := meetingplannerdb.QueryRow(`SELECT id FROM users WHERE userName=$1`, userName)
-	err := row.Scan(&user.ID)
+	err = userID.Scan(&user.ID)
 	check(err)
-	participantMeeting, err := meetingplannerdb.Query(`SELECT * FROM participants WHERE userID=$1`, user.ID)
-	defer participantMeeting.Close()
+
+	participants, err := meetingplannerdb.Query(`SELECT * FROM participants WHERE userID=$1`, user.ID)
+
+	defer participants.Close()
+
 	if err == sql.ErrNoRows {
+
 		output(w, "No Data :")
+		return
+
 	} else {
-		fmt.Println("Participant of Meeting:\n")
+
 		check(err)
-		for participantMeeting.Next() {
-			meeting := new(Meeting)
-			p := new(Participant)
-			err := participantMeeting.Scan(&p.ID, &p.MeetingID, &p.UserID)
+		for participants.Next() {
+			var meeting Meeting
+			var p Participant
+
+			err := participants.Scan(&p.ID, &p.MeetingID, &p.UserID)
 			check(err)
-			q := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE meetingID=$1`, p.MeetingID)
-			err := q.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
-			meetings = append(meetings, mee)
+
+			q := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE id=$1`, p.MeetingID)
+			err = q.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+			meetings.Meetings = append(meetings.Meetings, meeting)
 		}
 
 	}
-	output(w, meetings)
+	output(w, "Users Meetings:\n")
+	output(w, meetings.Meetings)
 }
 
 /*

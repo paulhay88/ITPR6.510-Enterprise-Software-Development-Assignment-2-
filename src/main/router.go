@@ -32,6 +32,7 @@ func route() {
 	// router.POST("/createUser/", createUser)
 
 	// Meetings
+	router.GET("/userMeetings", findUsersMeetings)
 	router.GET("/", getMeetings)
 	router.POST("/meeting/create", createMeeting)
 	router.PUT("/meeting/:id/edit", updateMeeting)
