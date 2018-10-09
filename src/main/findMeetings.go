@@ -10,12 +10,12 @@ func findOwnedMeeting(w http.ResponseWriter, r *http.Request, httprouter.Params)
 	defer findMeeting.Close()
 	decode := json.NewDecoder(r.Body).Decode(&findMeeting)
 	check(decode)
-	OwnedMeeting, err := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE ownerID=$1`, user.UserID)
-	check(err)
+	OwnedMeeting := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE ownerID=$1`, user.UserID)
+	check(OwnedMeeting)
 	defer OwnedMeeting.Close()
-	result, err2 := foundMeeting.Scan(&id, &dateAndTime, &roomID, &topic, &agenda, &ownerID, &participants)
+	result := foundMeeting.Scan(&id, &dateAndTime, &roomID, &topic, &agenda, &ownerID, &participants)
 	defer result.Close()
-	check(err2)
+	check(result)
 	if result == sql.ErrNoRows {
 		output(w, "No Data :")
 	} else {
@@ -26,16 +26,16 @@ func findOwnedMeeting(w http.ResponseWriter, r *http.Request, httprouter.Params)
 
 func findMyParticipantMeetings(w http.ResponseWriter, r *http.Request, httprouter.Params){
 	//Finds meeting by userName from Cookie
-	meetingCookie, err := r.Cokkie("authUser")
-	check(err)
+	meetingCookie := r.Cokkie("authUser")
+	check(meetingCookie)
 	defer meetingCookie.Close()
-	userName, err2 := strings.Split(meetingCookie.Value, ":")[0]
+	userName := strings.Split(meetingCookie.Value, ":")[0]
 	defer userName.Close()
-	check(err2)
+	check(userName)
 	//For all meetings in DB
-	participantMeeting, err3 := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE participants = $1`, userName)
+	participantMeeting := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE participants = $1`, userName)
 	defer ParticipantMeeting.Close()
-	check(err3)
+	check(participantMeeting)
 	if participantMeeting == sql.ErrNoRows {
 		output(w, "No Data :")
 	} else {
@@ -46,12 +46,12 @@ func findMyParticipantMeetings(w http.ResponseWriter, r *http.Request, httproute
 
 func FindRoom(w http.ResponseWriter, r *http.Request, httprouter.Params){
 	//need to know how to reference the info user puts in what variable to call and run through RegEx expression
-	reg, err := regexp.MustCompile((\d+)([0-9]+))
-	check(err)
+	reg := regexp.MustCompile((\d+)([0-9]+))
+	check(reg)
 	defer reg.Close()
-	roomNumber, err2 := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE RoomID = $1`, reg)  //variable based on input from user RegEx
+	roomNumber := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE RoomID = $1`, reg)  //variable based on input from user RegEx
 	defer roomNumber.Close()
-	check(err2)
+	check(roomNumber)
 	if roomNumber == sql.ErrNoRows {
 		output(w, "No Data :")
 	} else {
@@ -61,12 +61,12 @@ func FindRoom(w http.ResponseWriter, r *http.Request, httprouter.Params){
 }
 
 func AgendaSearch(w http.ResponseWriter, r *http.Request, httprouter.Params){ //using s as the string to be used within the regular expression
-	reg, err := regexp.MustCompile([^.?!]*(?<=[.?\s!])string(?=[\s.?!])[^.?!]*[.?!])
+	reg := regexp.MustCompile([^.?!]*(?<=[.?\s!])string(?=[\s.?!])[^.?!]*[.?!])
 	defer reg.Close()
-	check(err)
-	agendaReturn, err2 := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE Agenda = $1`, reg)
+	check(reg)
+	agendaReturn := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE Agenda = $1`, reg)
 	defer agendaReturn.Close()
-	check(err2)
+	check(agendaReturn)
 	if agendaReturn == sql.ErrNoRows {
 		output(w, "No Data :")
 	} else {
@@ -77,12 +77,12 @@ func AgendaSearch(w http.ResponseWriter, r *http.Request, httprouter.Params){ //
 
 
 func TopicSearch(w http.ResponseWriter, r *http.Request, s httprouter.Params){ //using s as the string to be used within the regular expression
-	reg, err := regexp.MustCompile([a-zA-Z0-9])
+	reg := regexp.MustCompile([a-zA-Z0-9])
 	defer reg.Close()
-	check(err)
-	topicReturn, err2 := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE Agenda = $1`, reg)
+	check(reg)
+	topicReturn := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE Agenda = $1`, reg)
 	defer topicReturn.Close()
-	check(err2)
+	check(topicReturn)
 	if topicReturn == sql.ErrNoRows {
 		output(w, "No Data :")
 	} else {
