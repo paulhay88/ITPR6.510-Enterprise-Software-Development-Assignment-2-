@@ -1,16 +1,15 @@
 package main
 
 import (
-	"time"
-	"regexp"
-	"fmt"
-	"encoding/json"
-	"log"
-	"net/http"
 	"database/sql"
-	"github.com/urfave/negroni"
+	"fmt"
+	"net/http"
+	"strings"
+
+	"github.com/julienschmidt/httprouter"
 )
 
+/*
 func findOwnedMeeting(w http.ResponseWriter, r *http.Request, httprouter.Params) {
 	var findMeeting = new(Meeting)
 	defer findMeeting.Close()
@@ -30,36 +29,44 @@ func findOwnedMeeting(w http.ResponseWriter, r *http.Request, httprouter.Params)
 		output(w, result)
 	}
 }
-
-func findMyParticipantMeetings(w http.ResponseWriter, r *http.Request, httprouter.Params){
-	//Finds meeting by userName from Cookie
+*/
+func findMyParticipantMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	meetingCookie := r.Cokkie("authUser")
-	check(meetingCookie)
-	defer meetingCookie.Close()
+	meetings := new(Meetings)
+	user := new(User)
 	userName := strings.Split(meetingCookie.Value, ":")[0]
-	check(userName)
-	defer userName.Close()
-	//For all meetings in DB
-	participantMeeting := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE participants = $1`, userName)
-	check(participantMeeting)
-	defer ParticipantMeeting.Close()
-	if participantMeeting == sql.ErrNoRows {
+	userID := meetingplannerdb.QueryRow(`SELECT id FROM users WHERE userName=$1`, userName)
+	err := row.Scan(&user.ID)
+	check(err)
+	participantMeeting, err := meetingplannerdb.Query(`SELECT * FROM participants WHERE userID=$1`, user.ID)
+	defer participantMeeting.Close()
+	if err == sql.ErrNoRows {
 		output(w, "No Data :")
 	} else {
 		fmt.Println("Participant of Meeting:\n")
-		output(w, participantMeeting)
+		check(err)
+		for participantMeeting.Next() {
+			meeting := new(Meeting)
+			p := new(Participant)
+			err := participantMeeting.Scan(&p.ID, &p.MeetingID, &p.UserID)
+			check(err)
+			q := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE meetingID=$1`, p.MeetingID)
+			err := q.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+			meetings = append(meetings, mee)
+		}
+
 	}
+	output(w, meetings)
 }
 
+/*
 func FindRoom(w http.ResponseWriter, r *http.Request, httprouter.Params){
 	//need to know how to reference the info user puts in what variable to call and run through RegEx expression
 	reg := regexp.MustCompile((\d+)([0-9]+))
-	check(reg)
-	defer reg.Close()
+
+
 	roomNumber := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE RoomID = $1`, reg)  //variable based on input from user RegEx
-	check(roomNumber)
-	defer roomNumber.Close()
-		if roomNumber == sql.ErrNoRows {
+	if roomNumber == sql.ErrNoRows {
 		output(w, "No Data :")
 	} else {
 		fmt.Println("Room Number:\n")
@@ -69,11 +76,9 @@ func FindRoom(w http.ResponseWriter, r *http.Request, httprouter.Params){
 
 func AgendaSearch(w http.ResponseWriter, r *http.Request, httprouter.Params){ //using s as the string to be used within the regular expression
 	reg := regexp.MustCompile([^.?!]*(?<=[.?\s!])string(?=[\s.?!])[^.?!]*[.?!])
-	check(reg)
-	defer reg.Close()
+
 	agendaReturn := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE Agenda = $1`, reg)
-	check(agendaReturn)
-	defer agendaReturn.Close()
+
 	if agendaReturn == sql.ErrNoRows {
 		output(w, "No Data :")
 	} else {
@@ -83,13 +88,11 @@ func AgendaSearch(w http.ResponseWriter, r *http.Request, httprouter.Params){ //
 }
 
 
-func TopicSearch(w http.ResponseWriter, r *http.Request, s httprouter.Params){ //using s as the string to be used within the regular expression
+func TopicSearch(w http.ResponseWriter, r *http.Request, httprouter.Params){ //using s as the string to be used within the regular expression
 	reg := regexp.MustCompile([a-zA-Z0-9])
-	check(reg)
-	defer reg.Close()
+
 	topicReturn := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE Agenda = $1`, reg)
-	check(topicReturn)
-	defer topicReturn.Close()
+
 	if topicReturn == sql.ErrNoRows {
 		output(w, "No Data :")
 	} else {
@@ -97,13 +100,13 @@ func TopicSearch(w http.ResponseWriter, r *http.Request, s httprouter.Params){ /
 		output(w, topicReturn)
 	}
 }
-
+*/
 /*
-	ID           int       
-	TimeAndDate  time.Time 
-	RoomID       int      
-	Topic        string    
-	Agenda       string    
-	OwnerID      int       
+	ID           int
+	TimeAndDate  time.Time
+	RoomID       int
+	Topic        string
+	Agenda       string
+	OwnerID      int
 	Participants []User
 */
