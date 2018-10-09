@@ -8,27 +8,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-/*
-func findOwnedMeeting(w http.ResponseWriter, r *http.Request, httprouter.Params) {
-	var findMeeting = new(Meeting)
-	defer findMeeting.Close()
-	decode := json.NewDecoder(r.Body).Decode(&findMeeting)
-	check(decode)
-	defer decode.Close()
-	OwnedMeeting := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE ownerID=$1`, user.UserID)
-	check(OwnedMeeting)
-	defer OwnedMeeting.Close()
-	result := foundMeeting.Scan(&id, &dateAndTime, &roomID, &topic, &agenda, &ownerID, &participants)
-	check(result)
-	defer result.Close()
-	if result == sql.ErrNoRows {
-		output(w, "No Data :")
-	} else {
-		fmt.Println("Owner of :\n")
-		output(w, result)
-	}
-}
-*/
 func findUsersMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	meetingCookie, err := r.Cookie("authUser")
 	check(err)
@@ -75,8 +54,6 @@ func findUsersMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 func FindRoom(w http.ResponseWriter, r *http.Request, httprouter.Params){
 	//need to know how to reference the info user puts in what variable to call and run through RegEx expression
 	reg := regexp.MustCompile((\d+)([0-9]+))
-
-
 	roomNumber := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE RoomID = $1`, reg)  //variable based on input from user RegEx
 	if roomNumber == sql.ErrNoRows {
 		output(w, "No Data :")
