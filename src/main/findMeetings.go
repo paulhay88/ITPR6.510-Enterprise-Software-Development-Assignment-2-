@@ -1,59 +1,64 @@
 package main
 
 import (
-<<<<<<< HEAD
-	"encoding/json"
-	"net/http"
-=======
->>>>>>> 2ff7dcd3488081ae2ccf620962830572fa14a3da
 	"time"
+	"regexp"
 )
 
-type FindMeeting struct {
-	ID           int       `json:"id"`
-	TimeAndDate  time.Time `json:"timeAndDate"`
-	RoomID       int       `json:"roomID"`
-	Topic        string    `json:"topic"`
-	Agenda       string    `json:"agenda"`
-	OwnerID      int       `json:"ownerID"`
-	Participants []User
-}
-
-func findMeeting(w http.ResponseWriter, r *http.Request, httprouter.Params) {
-	//var findMeeting FindMeeting
+func findOwnedMeeting(w http.ResponseWriter, r *http.Request, httprouter.Params) {
+	var findMeeting = new(Meeting)
 	err := json.NewDecoder(r.Body).Decode(&findMeeting)
 	check(err)
+	OwnedMeeting := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE ownerID=$1`, user.UserID)
+	result := foundMeeting.Scan(&id, &dateAndTime, &roomID, &topic, &agenda, &ownerID, &participants)
+	if result == sql.ErrNoRows {
+		output(w, "No Data :")
+	} else {
+		fmt.Println("Owner of :\n")
+		output(w, result)
+	}
+}
 
-	/*
-	// get meeting owner ID match it with user id then go threogh and find participants in other meetings and input into 
-	// foundmeeting json file format for output.
-	//
+func findMyParticipantMeetings(w http.ResponseWriter, r *http.Request, httprouter.Params){
+	//Finds meeting by userName from Cookie
+	meetingCookie, _ := r.Cokkie("authUser")
+	userName, err := strings.Split(meetingCookie.Value, ":")[0]
+	check(err)
+	//For all meetings in DB
+	ParticipantMeeting := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE participants = $1`, userName)
+	if result == sql.ErrNoRows {
+		output(w, "No Data :")
+	} else {
+		fmt.Println("Owner of :\n")
+		output(w, ParticipantMeeting)
+	}
+}
 
-	// 
-	//get Meeeting
-		aMeeting := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE ownerID=$1`, user.UserID)
-		result = foundMeeting.Scan(&id, &dateAndTime, &roomID, &topic, &agenda, &ownerID, &participants)
-		if result == sql.ErrNoRows {
-			output(w, "No Data :")
-		} else {
-			output(w, result)
-		}
-	// newCookie, _ := r.Cookie("authUser")
+func FindRoom(w http.ResponseWriter, r *http.Request, s httprouter.Params){
+	//need to know how to reference the info user puts in what variable to call and run through RegEx expression
+	roomNumber := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE RoomID = $1`, s)  //variable based on input from user RegEx
+	output(w, roomNumber)
+}
 
-		// userName := strings.Split(newCookie.Value, ":")[0]
-		// password := strings.Split(newCookie.Value, ":")[1]
-
-		// output(w, userName)
-		// output(w, password)
+func AgendaSearch(w http.ResponseWriter, r *http.Request, s httprouter.Params){ //using s as the string to be used within the regular expression
+	reg := regexp.MustCompile([^.?!]*(?<=[.?\s!])string(?=[\s.?!])[^.?!]*[.?!])
+	agendaReturn := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE Agenda = $1`, reg)
+	output(w, agendaReturn)
+}
 
 
-	*/
+func TopicSearch(w http.ResponseWriter, r *http.Request, s httprouter.Params){ //using s as the string to be used within the regular expression
+	reg := regexp.MustCompile([a-zA-Z0-9])
+	topicReturn := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE Agenda = $1`, reg)
+	output(w, topicReturn)
 }
 
 /*
-	 roomID = $1,
-		 topic = $2,
-		 agenda = $3,
-		 ownerID = $4,
-		 dateAndTime = $5
+	ID           int       
+	TimeAndDate  time.Time 
+	RoomID       int      
+	Topic        string    
+	Agenda       string    
+	OwnerID      int       
+	Participants []User
 */
