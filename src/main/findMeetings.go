@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
@@ -48,6 +49,26 @@ func findUsersMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	}
 	output(w, "Users Meetings:\n")
 	output(w, meetings.Meetings)
+}
+
+func queryMeetings(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	// regex the parameters
+	// map the regex
+	// apply matches via query depending if null
+	// output the result
+
+	// Seperates and sub-groups query string
+	var queryExp = regexp.MustCompile(`(\?)?(?P<Topic>topic+)?(\=+)?(?P<TopicResult>[a-zA-z\_]+)?(\&+)?(?P<DateAndTime>dateAndTime)?(\=+)?(?P<DateAndTimeResult>[a-zA-Z0-9\.\-\\\:\/]+)?(\&)?(?P<RoomNAme>roomName)?(\=)?(?P<RoomResults>[a-zA-Z0-9\-\\\/]+)?(\&)?(?P<OwnerName>ownerName)?(\=)?(?P<OwnerResults>[a-zA-Z0-9\-\\\/\.]+)?`)
+
+	queryString := queryExp.FindStringSubmatch(params.ByName("query"))
+
+	subGroups := make(map[string]string)
+	for i, name := range queryExp.SubexpNames() {
+		if i != 0 && name != "" {
+			subGroups[name] = queryString[i]
+		}
+	}
+	output(w, subGroups["TopicResult"])
 }
 
 /*

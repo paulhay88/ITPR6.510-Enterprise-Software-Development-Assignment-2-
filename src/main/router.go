@@ -38,6 +38,9 @@ func route() {
 	router.PUT("/meeting/:id/edit", updateMeeting)
 	router.DELETE("/meeting/:id/delete", deleteMeeting)
 
+	// Query Meetings
+	router.GET("/meetings:query", queryMeetings)
+
 	// Users
 
 	// User settings
