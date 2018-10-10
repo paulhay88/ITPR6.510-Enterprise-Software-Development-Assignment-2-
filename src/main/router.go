@@ -39,7 +39,7 @@ func route() {
 	router.DELETE("/meeting/:id/delete", deleteMeeting)
 
 	// Query Meetings
-	router.GET("/meetings:query", queryMeetings)
+	router.GET("/meetings", queryMeetings)
 
 	// Users
 
