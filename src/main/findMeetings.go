@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"net/http"
-	"regexp"
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
@@ -52,23 +51,22 @@ func findUsersMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 }
 
 func queryMeetings(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	// regex the parameters
-	// map the regex
 	// apply matches via query depending if null
 	// output the result
 
-	// Seperates and sub-groups query string
-	var queryExp = regexp.MustCompile(`(\?)?(?P<Topic>topic+)?(\=+)?(?P<TopicResult>[a-zA-z\_]+)?(\&+)?(?P<DateAndTime>dateAndTime)?(\=+)?(?P<DateAndTimeResult>[a-zA-Z0-9\.\-\\\:\/]+)?(\&)?(?P<RoomNAme>roomName)?(\=)?(?P<RoomResults>[a-zA-Z0-9\-\\\/]+)?(\&)?(?P<OwnerName>ownerName)?(\=)?(?P<OwnerResults>[a-zA-Z0-9\-\\\/\.]+)?`)
+	// topic, dateAndTime, ownerName, roomName
 
-	queryString := queryExp.FindStringSubmatch(params.ByName("query"))
+	// queryString := `SELECT * FROM meetings WHERE `
 
-	subGroups := make(map[string]string)
-	for i, name := range queryExp.SubexpNames() {
-		if i != 0 && name != "" {
-			subGroups[name] = queryString[i]
-		}
-	}
-	output(w, subGroups["TopicResult"])
+	// err := r.URL.Query()["test"]
+	// output(w, err)
+
+	// userID, err := meetingplannerdb.Query(queryString, userName)
+	// err = userID.Scan(&user.ID)
+	// check(err)
+
+	output(w, r.URL.Query())
+
 }
 
 /*
@@ -120,3 +118,19 @@ func TopicSearch(w http.ResponseWriter, r *http.Request, httprouter.Params){ //u
 	OwnerID      int
 	Participants []User
 */
+
+// -------------------------------------------
+// r.URL.Query() functionality as passed parameter.
+// Built before discovering r.URL.Query()
+// -------------------------------------------
+// var queryExp = regexp.MustCompile(`(\?)?(?P<Topic>topic+)?(\=+)?(?P<TopicResult>[a-zA-z\_]+)?(\&+)?(?P<DateAndTime>dateAndTime)?(\=+)?(?P<DateAndTimeResult>[a-zA-Z0-9\.\-\\\:\/]+)?(\&)?(?P<RoomNAme>roomName)?(\=)?(?P<RoomResults>[a-zA-Z0-9\-\\\/]+)?(\&)?(?P<OwnerName>ownerName)?(\=)?(?P<OwnerResults>[a-zA-Z0-9\-\\\/\.]+)?`)
+
+// 	queryString := queryExp.FindStringSubmatch(params.ByName("query"))
+
+// 	subGroups := make(map[string]string)
+// 	for i, name := range queryExp.SubexpNames() {
+// 		if i != 0 && name != "" {
+// 			subGroups[name] = queryString[i]
+// 		}
+// 	}
+// 	output(w, subGroups["TopicResult"])
