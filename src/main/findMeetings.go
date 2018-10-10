@@ -56,7 +56,7 @@ func queryMeetings(w http.ResponseWriter, r *http.Request, params httprouter.Par
 	// map the regex
 	// apply matches via query depending if null
 	// output the result
-
+	output(w, "here")
 	// Seperates and sub-groups query string
 	var queryExp = regexp.MustCompile(`(\?)?(?P<Topic>topic+)?(\=+)?(?P<TopicResult>[a-zA-z\_]+)?(\&+)?(?P<DateAndTime>dateAndTime)?(\=+)?(?P<DateAndTimeResult>[a-zA-Z0-9\.\-\\\:\/]+)?(\&)?(?P<RoomNAme>roomName)?(\=)?(?P<RoomResults>[a-zA-Z0-9\-\\\/]+)?(\&)?(?P<OwnerName>ownerName)?(\=)?(?P<OwnerResults>[a-zA-Z0-9\-\\\/\.]+)?`)
 
