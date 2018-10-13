@@ -16,6 +16,7 @@ func route() {
 
 	mux := http.NewServeMux()
 
+	// Seperate
 	mux.Handle("/login", router)
 	mux.Handle("/signup", router)
 	mux.Handle("/", negroni.New(
@@ -32,8 +33,8 @@ func route() {
 	// router.POST("/createUser/", createUser)
 
 	// Meetings
-	router.GET("/userMeetings", findUsersMeetings)
-	router.GET("/", getMeetings)
+	router.GET("/allMeetings", getMeetings)
+	router.GET("/", findUsersMeetings)
 	router.POST("/meeting/create", createMeeting)
 	router.PUT("/meeting/:id/edit", updateMeeting)
 	router.DELETE("/meeting/:id/delete", deleteMeeting)
@@ -58,7 +59,7 @@ func route() {
 
 }
 
-// Turn struct
+// Turn struct into output
 func output(w http.ResponseWriter, myStruct interface{}) {
 	b, err := json.MarshalIndent(myStruct, "", "\t")
 	check(err)

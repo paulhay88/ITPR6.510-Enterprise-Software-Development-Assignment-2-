@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -11,6 +12,8 @@ import (
 func findUsersMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	meetingCookie, err := r.Cookie("authUser")
 	check(err)
+
+	output(w, "test")
 
 	meetings := new(Meetings)
 	user := new(User)
@@ -27,97 +30,80 @@ func findUsersMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 
 	if err == sql.ErrNoRows {
 
-		output(w, "No Data :")
+		output(w, "No Data")
 		return
+	}
 
-	} else {
+	check(err)
+	for participants.Next() {
+		var meeting Meeting
+		var p Participant
 
+		err := participants.Scan(&p.ID, &p.MeetingID, &p.UserID)
 		check(err)
-		for participants.Next() {
-			var meeting Meeting
-			var p Participant
 
-			err := participants.Scan(&p.ID, &p.MeetingID, &p.UserID)
-			check(err)
-
-			q := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE id=$1`, p.MeetingID)
-			err = q.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
-			meetings.Meetings = append(meetings.Meetings, meeting)
-		}
+		q := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE id=$1`, p.MeetingID)
+		err = q.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+		meetings.Meetings = append(meetings.Meetings, meeting)
 
 	}
-	output(w, "Users Meetings:\n")
 	output(w, meetings.Meetings)
 }
 
 func queryMeetings(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	// apply matches via query depending if null
-	// output the result
 
-	// topic, dateAndTime, ownerName, roomName
+	var meetings Meetings
 
-	// queryString := `SELECT * FROM meetings WHERE `
+	var values []interface{}
+	var where []string
+	var counter int
 
-	// err := r.URL.Query()["test"]
-	// output(w, err)
+	for _, k := range []string{"dateAndTime", "topic", "roomName", "ownerName"} {
+		if v, err := r.URL.Query()[k]; err {
+			counter++
+			var value interface{}
 
-	// userID, err := meetingplannerdb.Query(queryString, userName)
-	// err = userID.Scan(&user.ID)
-	// check(err)
-
-	output(w, r.URL.Query())
-
-}
-
-/*
-func FindRoom(w http.ResponseWriter, r *http.Request, httprouter.Params){
-	//need to know how to reference the info user puts in what variable to call and run through RegEx expression
-	reg := regexp.MustCompile((\d+)([0-9]+))
-	roomNumber := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE RoomID = $1`, reg)  //variable based on input from user RegEx
-	if roomNumber == sql.ErrNoRows {
-		output(w, "No Data :")
-	} else {
-		fmt.Println("Room Number:\n")
-		output(w, roomNumber)
+			if k == "roomName" {
+				fmt.Println(k)
+				_ = meetingplannerdb.QueryRow("SELECT id FROM rooms WHERE name=$1", v[0]).Scan(&value)
+				k = "roomID"
+			} else if k == "ownerName" {
+				_ = meetingplannerdb.QueryRow("SELECT id FROM users WHERE name=$1", v[0]).Scan(&value)
+				k = "ownerID"
+			} else {
+				value = v[0]
+			}
+			values = append(values, value)
+			where = append(where, fmt.Sprintf("%s = $%d", k, counter))
+		}
 	}
-}
 
-func AgendaSearch(w http.ResponseWriter, r *http.Request, httprouter.Params){ //using s as the string to be used within the regular expression
-	reg := regexp.MustCompile([^.?!]*(?<=[.?\s!])string(?=[\s.?!])[^.?!]*[.?!])
+	results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE "+strings.Join(where, " AND "), values...)
+	check(err)
 
-	agendaReturn := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE Agenda = $1`, reg)
+	for results.Next() {
+		var meeting Meeting
+		err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+		check(err)
 
-	if agendaReturn == sql.ErrNoRows {
-		output(w, "No Data :")
-	} else {
-		fmt.Println("Agenda Return :\n")
-		output(w, agendaReturn)
+		meetings.Meetings = append(meetings.Meetings, meeting)
 	}
+
+	output(w, meetings)
 }
 
+// func AgendaSearch(w http.ResponseWriter, r *http.Request, httprouter.Params){ //using s as the string to be used within the regular expression
+// 	reg := regexp.MustCompile([^.?!]*(?<=[.?\s!])string(?=[\s.?!])[^.?!]*[.?!])
 
-func TopicSearch(w http.ResponseWriter, r *http.Request, httprouter.Params){ //using s as the string to be used within the regular expression
-	reg := regexp.MustCompile([a-zA-Z0-9])
+// 	agendaReturn := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE Agenda = $1`, reg)
 
-	topicReturn := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE Agenda = $1`, reg)
-
-	if topicReturn == sql.ErrNoRows {
-		output(w, "No Data :")
-	} else {
-		fmt.Println("Topic Return:\n")
-		output(w, topicReturn)
-	}
-}
-*/
-/*
-	ID           int
-	TimeAndDate  time.Time
-	RoomID       int
-	Topic        string
-	Agenda       string
-	OwnerID      int
-	Participants []User
-*/
+// 	if agendaReturn == sql.ErrNoRows {
+// 		output(w, "No Data :")
+// 	} else {
+// 		fmt.Println("Agenda Return :\n")
+// 		output(w, agendaReturn)
+// 	}
+// }
 
 // -------------------------------------------
 // r.URL.Query() functionality as passed parameter.
