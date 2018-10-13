@@ -78,6 +78,12 @@ func queryMeetings(w http.ResponseWriter, r *http.Request, params httprouter.Par
 		}
 	}
 
+	// Return to home if query cleared.
+	if len(values) == 0 {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
 	results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE "+strings.Join(where, " AND "), values...)
 	check(err)
 
