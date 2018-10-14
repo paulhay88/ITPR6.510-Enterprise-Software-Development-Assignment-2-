@@ -42,6 +42,9 @@ func route() {
 	// Query Meetings
 	router.GET("/meetings", queryMeetings)
 
+	//AgendaSearch
+	router.GET("/searchAgenda", agendaSearch)
+
 	// Users
 
 	// User settings
