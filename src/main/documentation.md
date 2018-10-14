@@ -106,6 +106,7 @@ We have chosen to use the negroni package to handle the authentication of the Co
 side instead of on the server. Clearly describe the pros and cons.
 - All persistent data (bookings, user accounts, etc.) are to be stored in a PostgreSQL
 database. Explain the design choices you made to interact with the database.
+
 - The enterprise typically hosts a variety of operating systems and internet browsers.
 Discuss how your solution copes with this variety.
 - Provide a "Quick Start Guide" outlining the steps and details required to install your
