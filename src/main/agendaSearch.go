@@ -2,26 +2,26 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 )
 
-func agendaSearch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	output(w, "test")
-	_, err := r.Cookie("authUser")
+func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Params) {
+	agendaCookie, err := r.Cookie("authUser")
 	check(err)
-	output(w, "test")
-	var se agendaSearchStruct
-	//decode into a struct format to handle better possibly ? ? ?
+	//getting cokkie
+	output(w, "test1")
 
+	var se = new(agendaSearchStruct)
+	//getting username from cookie
+	userName := strings.Split(agendaCookie.Value, ":")[0]
+	//decoding the body aka search field
 	err = json.NewDecoder(r.Body).Decode(&se)
 	check(err)
-	//se += se + ".?"
-	//re := regexp.MustCompile(se)
-	regularSearch := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE agenda CONTAINS $1`, se)
-	fmt.Println("Agenda Return :")
-	output(w, regularSearch)
+	//full query using contians
+	searchQuery := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE userName=$1 AND agenda CONTAINS=$2`, userName, se)
+	output(w, searchQuery)
 
 }
