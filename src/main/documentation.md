@@ -102,6 +102,8 @@ We have chosen to use the negroni package to handle the authentication of the Co
 
 ### /users/:id/settings/delete DLETE request
 
+### /agendaSearch GET request
+
 - Discuss features of the MeetingPlanner that are candidates to be executed on the client
 side instead of on the server. Clearly describe the pros and cons.
 - All persistent data (bookings, user accounts, etc.) are to be stored in a PostgreSQL

@@ -43,7 +43,7 @@ func route() {
 	router.GET("/meetings", queryMeetings)
 
 	//AgendaSearch
-	router.GET("/searchAgenda", agendaSearch)
+	router.GET("/agendaSearch", agendaSearch)
 
 	// Users
 
