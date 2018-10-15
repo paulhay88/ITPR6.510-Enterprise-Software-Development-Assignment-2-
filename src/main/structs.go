@@ -63,3 +63,7 @@ type Participant struct {
 	UserID    int    `json:"userID"`
 	OwnerID   int    `json:"ownerID"`
 }
+
+type agendaSearchStruct struct {
+	KeyWord string `json:"keyWord"`
+}

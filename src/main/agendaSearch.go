@@ -9,11 +9,13 @@ import (
 )
 
 func agendaSearch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	output(w, "test")
 	_, err := r.Cookie("authUser")
 	check(err)
 	output(w, "test")
+	var se agendaSearchStruct
+	//decode into a struct format to handle better possibly ? ? ?
 
-	var se string
 	err = json.NewDecoder(r.Body).Decode(&se)
 	check(err)
 	//se += se + ".?"
