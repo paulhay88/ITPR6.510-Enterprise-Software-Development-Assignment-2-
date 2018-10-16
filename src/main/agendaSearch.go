@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -31,9 +32,10 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 					----------- switch these two out-------------
 					Bottom One returns double \\
 				*/
-				regExToSearch := `(^\b)(` + searchString + `)(\ )([a-zA-Z0-9\ \-]+)?(\.)?`
-				output(w, regExToSearch)
-				results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE agenda LIKE $1", regExToSearch)
+				regExToSearch := []string{`(^\b)(`, searchString, `)(\ )([a-zA-Z0-9\ \-]+)?(\.)?`}
+				convertedString := strings.Join(regExToSearch, "")
+				output(w, convertedString)
+				results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE agenda LIKE $1", convertedString)
 				check(err)
 				output(w, results)
 			} else if k == "phoneNumbe" {
