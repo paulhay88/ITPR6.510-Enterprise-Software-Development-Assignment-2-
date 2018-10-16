@@ -13,8 +13,6 @@ func findUsersMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	meetingCookie, err := r.Cookie("authUser")
 	check(err)
 
-	output(w, "test")
-
 	meetings := new(Meetings)
 	user := new(User)
 

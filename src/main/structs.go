@@ -44,13 +44,15 @@ type Meetings struct {
 	Meetings []Meeting `json:"meetings"`
 }
 type Meeting struct {
-	ID           int       `json:"id"`
-	TimeAndDate  time.Time `json:"timeAndDate"`
-	RoomID       int       `json:"roomID"`
-	Topic        string    `json:"topic"`
-	Agenda       string    `json:"agenda"`
-	OwnerID      int       `json:"ownerID"`
+	ID          int       `json:"id"`
+	TimeAndDate time.Time `json:"timeAndDate"`
+	RoomID      int       `json:"roomID"`
+	Topic       string    `json:"topic"`
+	Agenda      string    `json:"agenda"`
+	OwnerID     int       `json:"ownerID"`
+	// For decoding
 	Participants []User
+	RoomName     string
 }
 
 type Partipants struct {

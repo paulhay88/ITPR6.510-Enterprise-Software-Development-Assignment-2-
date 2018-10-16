@@ -166,7 +166,7 @@ func createTables(db *sql.DB) {
 	_, err = tx.Exec(`CREATE TABLE IF NOT EXISTS 
 		priorMeetings (
 			id SERIAL PRIMARY KEY,
-			meetingID INT REFERENCES users (id),
+			meetingID INT REFERENCES meetings (id),
 			userID INT REFERENCES users (id)
 		)`)
 	check(err)
@@ -174,7 +174,7 @@ func createTables(db *sql.DB) {
 	_, err = tx.Exec(`CREATE TABLE IF NOT EXISTS 
 		participants (
 			id SERIAL PRIMARY KEY,
-			meetingID INT REFERENCES users (id),
+			meetingID INT REFERENCES meetings (id),
 			userID INT REFERENCES users (id)
 		)`)
 	check(err)

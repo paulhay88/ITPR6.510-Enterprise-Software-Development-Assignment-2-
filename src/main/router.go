@@ -35,9 +35,9 @@ func route() {
 	// Meetings
 	router.GET("/allMeetings", getMeetings)
 	router.GET("/", findUsersMeetings)
-	router.POST("/meeting/create", createMeeting)
-	router.PUT("/meeting/:id/edit", updateMeeting)
-	router.DELETE("/meeting/:id/delete", deleteMeeting)
+	router.POST("/meetings/create", createMeeting)
+	router.PUT("/meetings/:id/edit", updateMeeting)
+	router.DELETE("/meetings/:id/delete", deleteMeeting)
 
 	// Query Meetings
 	router.GET("/meetings", queryMeetings)
