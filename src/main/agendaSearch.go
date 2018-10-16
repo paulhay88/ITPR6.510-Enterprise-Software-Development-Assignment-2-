@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -12,28 +11,48 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 	var values []interface{}
 
 	var counter int
-	agendaCookie, err := r.Cookie("authUser")
-	check(err)
-	userName := strings.Split(agendaCookie.Value, ":")[0]
-	userID := meetingplannerdb.QueryRow(`SELECT id FROM users WHERE userName=$1`, userName)
-
+	//agendaCookie, err := r.Cookie("authUser")
+	//check(err)
+	//userName := strings.Split(agendaCookie.Value, ":")[0]
+	//userID := meetingplannerdb.QueryRow(`SELECT id FROM users WHERE userName=$1`, userName)
+	//var regExpression string
+	var searchString string
 	for _, k := range []string{"sentence", "phoneNumbe", "email", "keyWords", "dollar"} {
 		if v, err := r.URL.Query()[k]; err {
 			counter++
 			var value interface{}
 
 			if k == "sentence" {
-				output(w, v[0])
-				//x = v[0]
-				//y := meetingplannerdb.Query("SELECT regexp_matches() FROM meetings WHERE id=$1", userID)
+				searchString = v[0]
+				output(w, "test")
+				//regExToSearch := `(^\\` + `b)(` + searchString + `)(\\` + ` )(a-zA-Z0-9\\` + ` \\` + `-]+?(\\` + `.)?`
+				/*
+					Top one tries to break the string up with double \\ but returns \\\\
+					----------- switch these two out-------------
+					Bottom One returns double \\
+				*/
+				regExToSearch := `(^\b)(` + searchString + `)(\ )([a-zA-Z0-9\ \-]+)?(\.)?`
+				output(w, regExToSearch)
+				results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE agenda LIKE $1", regExToSearch)
+				check(err)
+				output(w, results)
 			} else if k == "phoneNumbe" {
 				output(w, v[0])
+				//regExpression = `([a-zA-Z\ \-\$\.]+)?(\ )?([0-9\ \-\.]+)([a-zA-Z\ \-\.]+)`
 			} else if k == "email" {
 				output(w, v[0])
+				//regExpression = `([a-zA-Z\ \-]+)(\ )([a-zA-Z0-9\@]+)(\.)(com|net|us|ca|org|au|co\.nz)([a-zA-Z\ \-\.]+)`
 			} else if k == "keyWords" {
 				output(w, v[0])
+				/*
+					var var1 = "string"
+					var var2 = "string"
+					var var3 = "string"
+				*/
+				//regExpression = `([a-zA-Z\ \-\.\n]+)(\ )( ` + var1 + `)(\ )([a-zA-Z\ \-\.\n]+)(\ )(` + var2 + `)(\ )([a-zA-Z\ \-\.\n]+)(\ )(` + var3 + `)(\ )([a-zA-Z\ \-\.\n]+)`
 			} else if k == "dollar" {
 				output(w, v[0])
+				//regExpression = `([a-zA-Z0-9\ \-\.\n]+)(\ )(\$[0-9\.]+)(\ )([a-zA-Z\ \-\.\n]+)`
 			} else {
 				value = v[0]
 			}
@@ -46,7 +65,11 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 		}
 
 	}
-	output(w, userID)
+
+	//results, err := meetingplannerdb.Query("SELECT "+strings.Join(regExpression, " FROM meetings WHERE id=$1"), userID)
+
+	//output(w, userID)
+
 	//output(w, r.URL.Query())
 	/*
 		agendaCookie, err := r.Cookie("authUser")
