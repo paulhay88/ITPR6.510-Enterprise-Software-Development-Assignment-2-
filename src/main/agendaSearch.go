@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"regexp"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -24,23 +27,36 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 
 			if k == "sentence" {
 				searchString = v[0]
-				// output(w, searchString)
-				regExToSearch := `(^\\` + `b)(` + searchString + `)(\\` + ` )(a-zA-Z0-9\\` + ` \\` + `-]+?(\\` + `.)?`
-				/*
-					Top one tries to break the string up with double \\ but returns \\\\
-					----------- switch these two out-------------
-					Bottom One returns double \\
-				*/
-				// sillVar := `"\"`
-				// ------ I even tried setting it as its own charecter
-				// regExToSearch := []string{`(^\b)(`, searchString, `)(\ )([a-zA-Z0-9\ \-]+)?(\.)?`}
-				// convertedString := strings.Join(regExToSearch, "")
-				// output(w, regExToSearch)
-				// output(w, sillVar)
+				// Creating the RegEx as a String using []strings to build full query
 
-				results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE agenda LIKE $1", regExToSearch)
-				check(err)
-				output(w, results)
+				p1 := `(^\b)(`
+				// It seems to be the output function that doesn't work on these kinds of strings. Use this instead:
+				fmt.Fprintf(w, p1)
+
+				p2 := searchString
+				p3 := `)(\ )([a-zA-Z0-9\ \-]+)?(\.)?`
+				newA := []string{p1, p2, p3}
+				AnotherOne := strings.Join(newA, "")
+				output(w, AnotherOne) //Doesn't Work
+
+				regExToSearch := []string{`(^\b)(`, searchString, `)(\ )([a-zA-Z0-9\ \-]+)?(\.)?`}
+				anotherString := strings.Join(regExToSearch, "")
+				YetAnotherString, _ := regexp.Compile(anotherString)
+				output(w, YetAnotherString) //This Doesn't
+
+				Comp, _ := regexp.Compile("[\\D]") //This Works
+				y := Comp.FindString("T")
+				output(w, y)
+
+				//output(w, anotherString)
+				convertedString := regexp.MustCompile(anotherString)
+				//convertedString.FindAll()
+				output(w, convertedString)
+
+				//results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE agenda LIKE $1", convertedString)
+				//check(err)
+				//output(w, results)
+
 			} else if k == "phoneNumbe" {
 				output(w, v[0])
 				//regExpression = `([a-zA-Z\ \-\$\.]+)?(\ )?([0-9\ \-\.]+)([a-zA-Z\ \-\.]+)`
@@ -71,25 +87,4 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 
 	}
 
-	//results, err := meetingplannerdb.Query("SELECT "+strings.Join(regExpression, " FROM meetings WHERE id=$1"), userID)
-
-	//output(w, userID)
-
-	//output(w, r.URL.Query())
-	/*
-		agendaCookie, err := r.Cookie("authUser")
-		check(err)
-		//getting cokkie
-		output(w, "test1")
-
-		var se = new(agendaSearchStruct)
-		//getting username from cookie
-		userName := strings.Split(agendaCookie.Value, ":")[0]
-		//decoding the body aka search field
-		err = json.NewDecoder(r.Body).Decode(&se)
-		check(err)
-		//full query using contians
-		searchQuery := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE userName=$1 AND agenda CONTAINS=$2`, userName, se)
-		output(w, searchQuery)
-	*/
 }
