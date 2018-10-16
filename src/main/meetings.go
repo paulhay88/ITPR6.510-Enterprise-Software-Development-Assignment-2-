@@ -29,12 +29,8 @@ func createMeeting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 	err = meetingplannerdb.QueryRow(`SELECT id FROM rooms WHERE name=$1`, meeting.RoomName).Scan(&meeting.RoomID)
 	check(err)
 
-	// Transaction to ensure the last meeting ID is correct
-	tx, err := meetingplannerdb.Begin()
-	check(err)
-
 	// Create meeting
-	err = tx.QueryRow(
+	err = meetingplannerdb.QueryRow(
 		`INSERT INTO meetings(dateAndTime, roomID, topic, agenda, ownerID) VALUES($1, $2, $3, $4, $5) RETURNING id`,
 		meeting.TimeAndDate, meeting.RoomID, meeting.Topic, meeting.Agenda, meeting.OwnerID).Scan(&meeting.ID)
 
@@ -42,22 +38,11 @@ func createMeeting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 
 	fmt.Println(meeting.ID)
 
-	// Find meetingID
-	// err = tx.QueryRow(
-	// 	`SELECT id FROM meetings ORDER BY id DESC LIMIT 1`).Scan(&meeting.ID)
-	// check(err, "meetingID not found.")
-	// meetingID, err := res.LastInsertId()
-	// check(err)
-	// meeting.ID = int(meetingID)
-
 	// Add user as participant
-	_, err = tx.Exec(
+	_, err = meetingplannerdb.Exec(
 		`INSERT INTO participants(meetingID, userID) VALUES($1, $2)`,
 		meeting.ID, meeting.OwnerID)
 
-	check(err)
-
-	err = tx.Commit()
 	check(err)
 
 }
