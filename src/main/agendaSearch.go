@@ -25,16 +25,19 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 
 			if k == "sentence" {
 				searchString = v[0]
-				output(w, "test")
+				output(w, searchString)
 				//regExToSearch := `(^\\` + `b)(` + searchString + `)(\\` + ` )(a-zA-Z0-9\\` + ` \\` + `-]+?(\\` + `.)?`
 				/*
 					Top one tries to break the string up with double \\ but returns \\\\
 					----------- switch these two out-------------
 					Bottom One returns double \\
 				*/
+				sillVar := `"\"`
+				// ------ I even tried setting it as its own charecter
 				regExToSearch := []string{`(^\b)(`, searchString, `)(\ )([a-zA-Z0-9\ \-]+)?(\.)?`}
 				convertedString := strings.Join(regExToSearch, "")
 				output(w, convertedString)
+				output(w, sillVar)
 				results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE agenda LIKE $1", convertedString)
 				check(err)
 				output(w, results)
