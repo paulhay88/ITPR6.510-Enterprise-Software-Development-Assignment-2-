@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"regexp"
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
@@ -28,34 +27,17 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 			if k == "sentence" {
 				searchString = v[0]
 				// Creating the RegEx as a String using []strings to build full query
-
 				p1 := `(^\b)(`
-				// It seems to be the output function that doesn't work on these kinds of strings. Use this instead:
-				fmt.Fprintf(w, p1)
-
 				p2 := searchString
 				p3 := `)(\ )([a-zA-Z0-9\ \-]+)?(\.)?`
 				newA := []string{p1, p2, p3}
 				AnotherOne := strings.Join(newA, "")
-				output(w, AnotherOne) //Doesn't Work
-
-				regExToSearch := []string{`(^\b)(`, searchString, `)(\ )([a-zA-Z0-9\ \-]+)?(\.)?`}
-				anotherString := strings.Join(regExToSearch, "")
-				YetAnotherString, _ := regexp.Compile(anotherString)
-				output(w, YetAnotherString) //This Doesn't
-
-				Comp, _ := regexp.Compile("[\\D]") //This Works
-				y := Comp.FindString("T")
-				output(w, y)
-
-				//output(w, anotherString)
-				convertedString := regexp.MustCompile(anotherString)
-				//convertedString.FindAll()
-				output(w, convertedString)
-
-				//results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE agenda LIKE $1", convertedString)
-				//check(err)
-				//output(w, results)
+				fmt.Fprintf(w, AnotherOne)
+				output(w, "test")
+				//------------
+				results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE agenda LIKE $1", AnotherOne)
+				check(err)
+				output(w, results)
 
 			} else if k == "phoneNumbe" {
 				output(w, v[0])
