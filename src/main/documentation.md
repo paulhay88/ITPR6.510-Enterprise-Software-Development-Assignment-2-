@@ -106,12 +106,79 @@ We have chosen to use the negroni package to handle the authentication of the Co
 
 - Discuss features of the MeetingPlanner that are candidates to be executed on the client
 side instead of on the server. Clearly describe the pros and cons.
+
+
+################################## haven't done this part YET!!!!!! 
+
 - All persistent data (bookings, user accounts, etc.) are to be stored in a PostgreSQL
 database. Explain the design choices you made to interact with the database.
+## Database Model
+### Object Based Data Model
+In our Database we have 5 Tables to represent the entire structure of our application.
+1. users
+2. rooms
+3. meetings
+4. priorMeetings
+5. participants
+#### users
+users consists of 6 attributes, id is the PRIMARY KEY and all other fields are generated at time of user creation.
+1. id SERIAL PRIMARY KEY
+2. userName VARCHAR(50)
+3. name VARCHAR(50)
+4. phone VARCHAR(20)
+5. email VARCHAR(50)
+6. password VARCHAR(20)
+##### rooms
+rooms consists of only two attributes one is the PRIMARY KEY and the other is the name of the room.
+1. id SERIAL PRIMARY KEY
+2. name VARCHAR(20)
+#### meetings
+meetings is our most relational Table as it used by most functions to retrieve data. meetings is made up of 6 attributes, half of which are ID's. The reason for this was that it is a 'Meeting Planner Application' and needless to say 'meetings' are what its about. The use of references in relation to the meetings makes the relationships easy to establish as every person has something to do with some meeting 'generally' speaking.
+1. id SERIAL PRIMARY KEY
+2. topic VARCHAR(20)
+3. dateAndTime TIMESTAMP 
+4. agenda VARCHAR(1000)
+5. roomID INT REFERENCES rooms(id)
+6. ownerID INT REFERENCES users (id)
+#### priorMeetings
+priorMeetings is a copy of a previous meeting, in which we store the same data as a previous meeting. This tabe is purly relational and is completly ID based.
+1. id SERIAL PRIMARY KEY
+2. meetingID INT REFERENCES meetings (id)
+3. userID INT REFERENCES users (id)
+#### participants
+participants is also a relational Table and is merly a set of ID's that relate to usersID's and meetingID's.
+1. id SERIAL PRIMARY KEY
+2. meetingID INT REFERENCES meetings (id)
+3. userID INT REFERENCES users (id)
+##### Seeders
+To test our Database we have a set of randomly generated text behind Keywords in matching fields to test the database. Each seeder INSERT's data into corosponding Tables that return valid data sets for each field.
 
 - The enterprise typically hosts a variety of operating systems and internet browsers.
 Discuss how your solution copes with this variety.
+
+
 - Provide a "Quick Start Guide" outlining the steps and details required to install your
 application on a new server.
+1. Have a Database inplace that matches the corrosponding postgres dataset in the application in this case it is 
+    postgres 
+    user=postgres 
+    password=password 
+    dbname=meetingplannerdb 
+    sslmode=disable
+2. Open a CMD window by typing cmd.exe into the search portion of the Windows screen and navigate to the file location.
+3. Run the following command in the 'main' folder: go install main
+4. Followed by: main.exe
+5. Install RESTer on your Browser (prefeably Chrome)
+6. Open RESTer to Test the Application
+7. Loging in as a "Test User"
+- Use a POST method
+- Use the URL localhost:9090/login
+- The formatting is in .json and so in the body of the request type:
+{
+    "userName": "Test1",
+    "password": "Password1"
+}
+
+
 - Provide a document that lists the additional specifications that were missing but
 required to implement your solution.
