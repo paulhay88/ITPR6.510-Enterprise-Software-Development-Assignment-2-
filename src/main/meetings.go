@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
@@ -47,38 +48,105 @@ func createMeeting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 
 }
 
+// Accepts any fields from meetings.
 func updateMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 	var meeting = new(Meeting)
+	var userID int
 
-	err := json.NewDecoder(r.Body).Decode(&meeting)
+	// User updating meeting
+	meetingCookie, err := r.Cookie("authUser")
+	check(err)
+	userName := strings.Split(meetingCookie.Value, ":")[0]
+
+	err = meetingplannerdb.QueryRow(`SELECT id FROM users WHERE userName=$1`, userName).Scan(&userID)
+	check(err)
+	// Decode user passed data
+	err = json.NewDecoder(r.Body).Decode(&meeting)
 	check(err)
 
-	_, err = meetingplannerdb.Exec(
-		`UPDATE meetings
-		 SET roomID = $1, 
-			 topic = $2, 
-			 agenda = $3, 
-			 ownerID = $4,
-			 dateAndTime = $5
-		 WHERE 
-		 	 id = $6`,
-		meeting.RoomID, meeting.Topic, meeting.Agenda, meeting.OwnerID, meeting.TimeAndDate, params.ByName("id"))
+	// Get meeting id
+	meeting.ID, err = strconv.Atoi(params.ByName("id"))
 	check(err)
+	// Get owner id
+	err = meetingplannerdb.QueryRow(`SELECT ownerID FROM meetings WHERE id=$1`, meeting.ID).Scan(&meeting.OwnerID)
+	check(err)
+	// Find room associated with name
+	err = meetingplannerdb.QueryRow(`SELECT id FROM rooms WHERE name=$1`, meeting.RoomName).Scan(&meeting.RoomID)
+	check(err)
+
+	// Check if user is owner
+	if meeting.OwnerID != userID {
+
+		output(w, meeting.OwnerID)
+		// Not owner, only update agenda
+		_, err = meetingplannerdb.Exec(
+			`UPDATE meetings
+			 SET 
+				 agenda = $1
+			 WHERE 
+				  id = $2`,
+			meeting.Agenda, meeting.ID)
+		check(err)
+	} else {
+
+		// Owner update all that aren't null
+		_, err = meetingplannerdb.Exec(
+			`UPDATE meetings
+			 SET roomID = COALESCE((NULLIF($1, 0), roomID), 
+				 topic = COALESCE(NULLIF($2, ''), topic), 
+				 agenda = COALESCE(NULLIF($3, ''), agenda)
+			 WHERE 
+				  id = $4`,
+			meeting.RoomID, meeting.Topic, meeting.Agenda, meeting.ID)
+
+		// Issue here. Returns "syntax error near WHERE"
+		check(err, "test6")
+
+		// meeting.TimeAndDate
+		//  dateAndTime = COALESCE(NULLIF(($4 > current_timestamp), false), dateAndTime)
+	}
+
 }
 
 func deleteMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	_, err := meetingplannerdb.Exec(
-		`DELETE FROM participants
-		 WHERE meetingID = $1`,
-		params.ByName("id"))
+
+	var userID int
+	var meeting Meeting
+
+	// User updating meeting
+	meetingCookie, err := r.Cookie("authUser")
+	check(err)
+	userName := strings.Split(meetingCookie.Value, ":")[0]
+
+	err = meetingplannerdb.QueryRow(`SELECT id FROM users WHERE userName=$1`, userName).Scan(&userID)
 	check(err)
 
-	_, err = meetingplannerdb.Exec(
-		`DELETE FROM meetings
-		 WHERE id = $1`,
-		params.ByName("id"))
+	err = meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE id=$1`, params.ByName("id")).Scan(&meeting)
 	check(err)
+
+	// Check if user is owner
+	if meeting.OwnerID != userID {
+
+		// Not owner
+		return
+
+	} else {
+
+		// Owner can delete
+		_, err := meetingplannerdb.Exec(
+			`DELETE FROM participants
+			 WHERE meetingID = $1`,
+			meeting.ID)
+		check(err)
+
+		_, err = meetingplannerdb.Exec(
+			`DELETE FROM meetings
+			 WHERE id = $1`,
+			meeting.ID)
+		check(err)
+	}
+
 }
 
 // Outputs list of all meetings -- For testing purposes
