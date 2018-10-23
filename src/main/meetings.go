@@ -48,7 +48,7 @@ func createMeeting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 
 }
 
-// Accepts any fields from meetings.
+// Accepts room name, topic, agenda, time, (and participants TODO)
 func updateMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 	var meeting = new(Meeting)
@@ -63,7 +63,11 @@ func updateMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Par
 	check(err)
 	// Decode user passed data
 	err = json.NewDecoder(r.Body).Decode(&meeting)
-	check(err)
+	check(err, "Datetime conversion error")
+
+	fmt.Println("Datetime:")
+	fmt.Println(meeting.TimeAndDate)
+	fmt.Println("Datetime end")
 
 	// Get meeting id
 	meeting.ID, err = strconv.Atoi(params.ByName("id"))
@@ -90,22 +94,25 @@ func updateMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Par
 		check(err)
 	} else {
 
+		// Check if time is zero as theres a type incompatibility using NULLIF in postgres
+		// timeIsZero := Time.IsZero(meeting.TimeAndDate)
+
 		// Owner update all that aren't null
+		fmt.Println(meeting.TimeAndDate)
+
 		_, err = meetingplannerdb.Exec(
 			`UPDATE meetings
-			 SET roomID = COALESCE((NULLIF($1, 0), roomID), 
-				 topic = COALESCE(NULLIF($2, ''), topic), 
-				 agenda = COALESCE(NULLIF($3, ''), agenda)
-			 WHERE 
-				  id = $4`,
-			meeting.RoomID, meeting.Topic, meeting.Agenda, meeting.ID)
+			SET roomID = COALESCE(NULLIF($1, 0), roomID),
+			 	topic = COALESCE(NULLIF($2, ''), topic),
+				agenda = COALESCE(NULLIF($3, ''), agenda),
+				dateAndTime = COALESCE(NULLIF($4, TIMESTAMP '0001-01-01 00:00:00'), dateAndTime)
+			WHERE
+				  id = $5`,
+			meeting.RoomID, meeting.Topic, meeting.Agenda, meeting.TimeAndDate, meeting.ID)
+		check(err)
 
-		// Issue here. Returns "syntax error near WHERE"
-		check(err, "test6")
-
-		// meeting.TimeAndDate
-		//  dateAndTime = COALESCE(NULLIF(($4 > current_timestamp), false), dateAndTime)
 	}
+	// dateAndTime = COALESCE(NULLIF($4, NULL), dateAndTime)
 
 }
 

@@ -162,3 +162,4 @@ Kassian
 - Read and/or edit agenda
 - Change booking
 - User settings
+- Ability to see and update participants
