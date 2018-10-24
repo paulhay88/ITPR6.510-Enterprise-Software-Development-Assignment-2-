@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -69,20 +70,48 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 					myMeetings.Meetings = append(myMeetings.Meetings, meeting)
 				}
 				output(w, myMeetings)
+				//Working uptill here
 			} else if k == "keyWords" {
-				output(w, v[0])
-				/*
-					for len(v){
-						insert into array of strings
-						concatanate those and search for them
-					}
-						var var1 = "string"
-						var var2 = "string"
-						var var3 = "string"
-				*/
-				//regExpression = `([a-zA-Z\ \-\.\n]+)(\ )( ` + var1 + `)(\ )([a-zA-Z\ \-\.\n]+)(\ )(` + var2 + `)(\ )([a-zA-Z\ \-\.\n]+)(\ )(` + var3 + `)(\ )([a-zA-Z\ \-\.\n]+)`
+				k1 := v[0]
+				k2 := v[1]
+				k3 := v[2]
+				p0 := `(`
+				p1 := k1
+				p2 := `)([a-zA-Z\n\s\.\w]+)?(`
+				p3 := k2
+				p4 := `)([a-zA-Z\n\s\.\w]+)?(`
+				p5 := k3
+				p6 := `)`
+				p7 := `|`
+				newA := []string{p0, p1, p2, p3, p4, p5, p6, p7, p0, p3, p2, p5, p4, p1, p6, p7, p0, p5, p2, p1, p4, p3, p6}
+				AnotherOne := strings.Join(newA, "")
+				results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE agenda ~* $1", AnotherOne)
+				check(err)
+				for results.Next() {
+					var meeting Meeting
+					err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+					check(err)
+					myMeetings.Meetings = append(myMeetings.Meetings, meeting)
+				}
+				output(w, myMeetings)
 			} else if k == "dollar" {
-				output(w, v[0])
+				searchString = v[1]
+				p1 := `([a-zA-z0-9\n\.\s\-])+(\\`
+				p2 := searchString
+				p3 := `\b)([a-zA-z0-9\n\.\s\-])+`
+
+				newA := []string{p1, p2, p3}
+				fmt.Println(newA)
+				AnotherOne := strings.Join(newA, "")
+				results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE agenda ~* $1", AnotherOne)
+				check(err)
+				for results.Next() {
+					var meeting Meeting
+					err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+					check(err)
+					myMeetings.Meetings = append(myMeetings.Meetings, meeting)
+				}
+				output(w, myMeetings)
 				//regExpression = `([a-zA-Z0-9\ \-\.\n]+)(\ )(\$[0-9\.]+)(\ )([a-zA-Z\ \-\.\n]+)`
 			} else {
 				value = v[0]
