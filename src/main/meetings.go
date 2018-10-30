@@ -11,6 +11,7 @@ import (
 )
 
 // Accepts date, room name, topic, and agenda (TODO participants)
+// dateTime format: "2012-09-04 14:32"
 func createMeeting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	var meeting = new(Meeting)
@@ -50,7 +51,6 @@ func createMeeting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 }
 
 // Accepts room name, topic, agenda, dateTime, (and participants TODO)
-// dateTime format: "2012-09-04 14:32"
 // Only updates agenda if user not owner
 func updateMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 

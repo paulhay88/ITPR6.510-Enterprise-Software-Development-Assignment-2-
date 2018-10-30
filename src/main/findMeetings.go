@@ -47,6 +47,34 @@ func findUsersMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 		err = meetingplannerdb.QueryRow(`SELECT name FROM rooms WHERE id=$1`, meeting.RoomID).Scan(&meeting.RoomName)
 		check(err)
 
+		// Get participants belonging to meeting
+		participants, err := meetingplannerdb.Query(`SELECT * FROM participants WHERE meetingID=$1`, meeting.ID)
+		check(err)
+		defer participants.Close()
+
+		for participants.Next() {
+
+			var participant Participant
+
+			err := participants.Scan(&participant.ID, &participant.MeetingID, &participant.UserID)
+			check(err)
+
+			// Get user associated with participants entry. Put this user in meetings.Participants
+			users, err := meetingplannerdb.Query(`SELECT * FROM users WHERE id=$1`, participant.UserID)
+			check(err)
+			defer users.Close()
+
+			for users.Next() {
+				var user User
+				var localPass string // keep password safe
+
+				err := users.Scan(&user.ID, &user.UserName, &user.Name, &user.Email, &user.Phone, &localPass)
+				check(err)
+
+				meeting.Participants = append(meeting.Participants, user)
+			}
+		}
+
 		meetings.Meetings = append(meetings.Meetings, meeting)
 
 	}

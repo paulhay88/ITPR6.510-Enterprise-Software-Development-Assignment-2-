@@ -145,5 +145,8 @@ Kassian
 - User settings
 - Ability to see and update participants
 
+- Add participants
 - Create room if roomname does not exist
 - Add tests
+
+- Add run down of every route with all possible inputs

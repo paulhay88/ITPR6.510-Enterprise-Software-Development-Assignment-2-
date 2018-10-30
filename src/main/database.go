@@ -203,7 +203,7 @@ func seed(db *sql.DB) {
 		// Test users
 		_, err = tx.Exec(`INSERT INTO 
 		users(name, userName, phone, email, password) VALUES(
-			$1, $2, $3, $4, $5)`, "PHONE_"+randStr(10), "test"+strconv.Itoa(i), "PHONE_"+randStr(10), "EMAIL_"+randStr(10), "password"+strconv.Itoa(i))
+			$1, $2, $3, $4, $5)`, "NAME_"+randStr(10), "test"+strconv.Itoa(i), "PHONE_"+randStr(10), "EMAIL_"+randStr(10), "password"+strconv.Itoa(i))
 		check(err)
 
 		// Rooms seed
