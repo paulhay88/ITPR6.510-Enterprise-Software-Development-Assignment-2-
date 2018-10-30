@@ -1,25 +1,6 @@
 // Useful Resources:
 https://golang.org/doc/articles/wiki/
 
-Participants
-
-- 
-
-Interaction roles:
-- read
-- write
-- owner
-
-Meetings
-- Date & time
-- room
-- topic
-- participants
-- agenda
-
-
-
-
 Tables:
 - Users
 - - id, name, email, phone, password
@@ -163,3 +144,6 @@ Kassian
 - Change booking
 - User settings
 - Ability to see and update participants
+
+- Create room if roomname does not exist
+- Add tests

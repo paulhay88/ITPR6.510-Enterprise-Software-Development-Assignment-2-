@@ -10,6 +10,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// Accepts date, room name, topic, and agenda (TODO participants)
 func createMeeting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	var meeting = new(Meeting)
@@ -48,7 +49,9 @@ func createMeeting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 
 }
 
-// Accepts room name, topic, agenda, time, (and participants TODO)
+// Accepts room name, topic, agenda, dateTime, (and participants TODO)
+// dateTime format: "2012-09-04 14:32"
+// Only updates agenda if user not owner
 func updateMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 	var meeting = new(Meeting)
@@ -63,10 +66,10 @@ func updateMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Par
 	check(err)
 	// Decode user passed data
 	err = json.NewDecoder(r.Body).Decode(&meeting)
-	check(err, "Datetime conversion error")
+	check(err, "Decoding error")
 
 	fmt.Println("Datetime:")
-	fmt.Println(meeting.TimeAndDate)
+	fmt.Println(meeting.DateTime)
 	fmt.Println("Datetime end")
 
 	// Get meeting id
@@ -94,12 +97,7 @@ func updateMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Par
 		check(err)
 	} else {
 
-		// Check if time is zero as theres a type incompatibility using NULLIF in postgres
-		// timeIsZero := Time.IsZero(meeting.TimeAndDate)
-
 		// Owner update all that aren't null
-		fmt.Println(meeting.TimeAndDate)
-
 		_, err = meetingplannerdb.Exec(
 			`UPDATE meetings
 			SET roomID = COALESCE(NULLIF($1, 0), roomID),
@@ -108,12 +106,10 @@ func updateMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Par
 				dateAndTime = COALESCE(NULLIF($4, TIMESTAMP '0001-01-01 00:00:00'), dateAndTime)
 			WHERE
 				  id = $5`,
-			meeting.RoomID, meeting.Topic, meeting.Agenda, meeting.TimeAndDate, meeting.ID)
+			meeting.RoomID, meeting.Topic, meeting.Agenda, meeting.DateTime, meeting.ID)
 		check(err)
 
 	}
-	// dateAndTime = COALESCE(NULLIF($4, NULL), dateAndTime)
-
 }
 
 func deleteMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Params) {

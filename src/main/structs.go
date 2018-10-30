@@ -50,6 +50,7 @@ type Meeting struct {
 	Topic       string    `json:"topic"`
 	Agenda      string    `json:"agenda"`
 	OwnerID     int       `json:"ownerID"`
+	DateTime    string    `json:"dateTime"`
 	// For decoding
 	Participants []User
 	RoomName     string
