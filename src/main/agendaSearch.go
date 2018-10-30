@@ -29,7 +29,7 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 				check(err)
 				for results.Next() {
 					var meeting Meeting
-					err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+					err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.DateTime, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
 					check(err)
 					myMeetings.Meetings = append(myMeetings.Meetings, meeting)
 				}
@@ -47,7 +47,7 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 				check(err)
 				for results.Next() {
 					var meeting Meeting
-					err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+					err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.DateTime, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
 					check(err)
 					myMeetings.Meetings = append(myMeetings.Meetings, meeting)
 				}
@@ -65,7 +65,7 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 				check(err)
 				for results.Next() {
 					var meeting Meeting
-					err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+					err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.DateTime, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
 					check(err)
 					myMeetings.Meetings = append(myMeetings.Meetings, meeting)
 				}
@@ -89,7 +89,7 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 				check(err)
 				for results.Next() {
 					var meeting Meeting
-					err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+					err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.DateTime, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
 					check(err)
 					myMeetings.Meetings = append(myMeetings.Meetings, meeting)
 				}
@@ -107,7 +107,7 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 				check(err)
 				for results.Next() {
 					var meeting Meeting
-					err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+					err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.DateTime, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
 					check(err)
 					myMeetings.Meetings = append(myMeetings.Meetings, meeting)
 				}

@@ -22,9 +22,9 @@ func findUsersMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	err = userID.Scan(&user.ID)
 	check(err)
 
-	participants, err := meetingplannerdb.Query(`SELECT * FROM participants WHERE userID=$1`, user.ID)
+	userIsParticipant, err := meetingplannerdb.Query(`SELECT * FROM participants WHERE userID=$1`, user.ID)
 
-	defer participants.Close()
+	defer userIsParticipant.Close()
 
 	if err == sql.ErrNoRows {
 
@@ -33,15 +33,20 @@ func findUsersMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	}
 
 	check(err)
-	for participants.Next() {
+	for userIsParticipant.Next() {
 		var meeting Meeting
 		var p Participant
 
-		err := participants.Scan(&p.ID, &p.MeetingID, &p.UserID)
+		err := userIsParticipant.Scan(&p.ID, &p.MeetingID, &p.UserID)
 		check(err)
 
 		q := meetingplannerdb.QueryRow(`SELECT * FROM meetings WHERE id=$1`, p.MeetingID)
-		err = q.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+		err = q.Scan(&meeting.ID, &meeting.Topic, &meeting.DateTime, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+
+		// Get room name
+		err = meetingplannerdb.QueryRow(`SELECT name FROM rooms WHERE id=$1`, meeting.RoomID).Scan(&meeting.RoomName)
+		check(err)
+
 		meetings.Meetings = append(meetings.Meetings, meeting)
 
 	}
@@ -87,7 +92,7 @@ func queryMeetings(w http.ResponseWriter, r *http.Request, params httprouter.Par
 
 	for results.Next() {
 		var meeting Meeting
-		err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+		err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.DateTime, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
 		check(err)
 
 		meetings.Meetings = append(meetings.Meetings, meeting)

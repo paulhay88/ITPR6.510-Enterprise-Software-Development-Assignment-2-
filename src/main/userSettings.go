@@ -32,7 +32,7 @@ func getUserSettings(w http.ResponseWriter, r *http.Request, params httprouter.P
 		defer meetings.Close()
 
 		for meetings.Next() {
-			err := meetings.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+			err := meetings.Scan(&meeting.ID, &meeting.Topic, &meeting.DateTime, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
 			check(err)
 		}
 

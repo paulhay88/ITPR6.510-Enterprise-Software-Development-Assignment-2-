@@ -1,7 +1,5 @@
 package main
 
-import "time"
-
 // Users array
 type Users struct {
 	Users []User `json:"users"`
@@ -44,13 +42,12 @@ type Meetings struct {
 	Meetings []Meeting `json:"meetings"`
 }
 type Meeting struct {
-	ID          int       `json:"id"`
-	TimeAndDate time.Time `json:"timeAndDate"`
-	RoomID      int       `json:"roomID"`
-	Topic       string    `json:"topic"`
-	Agenda      string    `json:"agenda"`
-	OwnerID     int       `json:"ownerID"`
-	DateTime    string    `json:"dateTime"`
+	ID       int    `json:"id"`
+	RoomID   int    `json:"roomID"`
+	Topic    string `json:"topic"`
+	Agenda   string `json:"agenda"`
+	OwnerID  int    `json:"ownerID"`
+	DateTime string `json:"dateTime"`
 	// For decoding
 	Participants []User
 	RoomName     string

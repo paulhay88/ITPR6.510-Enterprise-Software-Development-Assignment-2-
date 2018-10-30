@@ -31,14 +31,14 @@ func createMeeting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 	err = meetingplannerdb.QueryRow(`SELECT id FROM rooms WHERE name=$1`, meeting.RoomName).Scan(&meeting.RoomID)
 	check(err)
 
+	fmt.Println(meeting.DateTime)
+
 	// Create meeting
 	err = meetingplannerdb.QueryRow(
 		`INSERT INTO meetings(dateAndTime, roomID, topic, agenda, ownerID) VALUES($1, $2, $3, $4, $5) RETURNING id`,
-		meeting.TimeAndDate, meeting.RoomID, meeting.Topic, meeting.Agenda, meeting.OwnerID).Scan(&meeting.ID)
+		meeting.DateTime, meeting.RoomID, meeting.Topic, meeting.Agenda, meeting.OwnerID).Scan(&meeting.ID)
 
 	check(err)
-
-	fmt.Println(meeting.ID)
 
 	// Add user as participant
 	_, err = meetingplannerdb.Exec(
@@ -68,10 +68,6 @@ func updateMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Par
 	err = json.NewDecoder(r.Body).Decode(&meeting)
 	check(err, "Decoding error")
 
-	fmt.Println("Datetime:")
-	fmt.Println(meeting.DateTime)
-	fmt.Println("Datetime end")
-
 	// Get meeting id
 	meeting.ID, err = strconv.Atoi(params.ByName("id"))
 	check(err)
@@ -97,7 +93,7 @@ func updateMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Par
 		check(err)
 	} else {
 
-		// Owner update all that aren't null
+		// Update all that aren't null
 		_, err = meetingplannerdb.Exec(
 			`UPDATE meetings
 			SET roomID = COALESCE(NULLIF($1, 0), roomID),
@@ -134,21 +130,20 @@ func deleteMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Par
 		// Not owner
 		return
 
-	} else {
-
-		// Owner can delete
-		_, err := meetingplannerdb.Exec(
-			`DELETE FROM participants
-			 WHERE meetingID = $1`,
-			meeting.ID)
-		check(err)
-
-		_, err = meetingplannerdb.Exec(
-			`DELETE FROM meetings
-			 WHERE id = $1`,
-			meeting.ID)
-		check(err)
 	}
+
+	// Owner can delete
+	_, err = meetingplannerdb.Exec(
+		`DELETE FROM participants
+			WHERE meetingID = $1`,
+		meeting.ID)
+	check(err)
+
+	_, err = meetingplannerdb.Exec(
+		`DELETE FROM meetings
+			WHERE id = $1`,
+		meeting.ID)
+	check(err)
 
 }
 
@@ -172,7 +167,11 @@ func getMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 		var meeting Meeting
 
-		err := meetings.Scan(&meeting.ID, &meeting.Topic, &meeting.TimeAndDate, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+		err := meetings.Scan(&meeting.ID, &meeting.Topic, &meeting.DateTime, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
+		check(err)
+
+		// Get room name
+		err = meetingplannerdb.QueryRow(`SELECT name FROM rooms WHERE id=$1`, meeting.RoomID).Scan(&meeting.RoomName)
 		check(err)
 
 		// Get participants belonging to meeting
