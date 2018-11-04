@@ -10,6 +10,7 @@ import (
 )
 
 func findUsersMeetings(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
 	meetingCookie, err := r.Cookie("authUser")
 	check(err)
 

@@ -49,8 +49,11 @@ type Meeting struct {
 	OwnerID  int    `json:"ownerID"`
 	DateTime string `json:"dateTime"`
 	// For decoding
+	ParticipantNames []string `json:"participants"`
+	RoomName         string
+
+	// For conveniance storage
 	Participants []User
-	RoomName     string
 }
 
 type Partipants struct {

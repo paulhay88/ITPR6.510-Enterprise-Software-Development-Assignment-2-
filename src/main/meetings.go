@@ -1,8 +1,8 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -16,7 +16,7 @@ func createMeeting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 
 	var meeting = new(Meeting)
 
-	// User creating meeting
+	// Owner
 	meetingCookie, err := r.Cookie("authUser")
 	check(err)
 	userName := strings.Split(meetingCookie.Value, ":")[0]
@@ -32,8 +32,6 @@ func createMeeting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 	err = meetingplannerdb.QueryRow(`SELECT id FROM rooms WHERE name=$1`, meeting.RoomName).Scan(&meeting.RoomID)
 	check(err)
 
-	fmt.Println(meeting.DateTime)
-
 	// Create meeting
 	err = meetingplannerdb.QueryRow(
 		`INSERT INTO meetings(dateAndTime, roomID, topic, agenda, ownerID) VALUES($1, $2, $3, $4, $5) RETURNING id`,
@@ -41,7 +39,27 @@ func createMeeting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 
 	check(err)
 
-	// Add user as participant
+	// Find and add participants
+	for _, username := range meeting.ParticipantNames {
+		var userID int
+
+		// Find
+		err = meetingplannerdb.QueryRow(`SELECT id FROM users WHERE username=$1`, username).Scan(&userID)
+		check(err)
+
+		// Cannot add self as participant
+		if userID != meeting.OwnerID {
+
+			// Add
+			_, err = meetingplannerdb.Exec(
+				`INSERT INTO participants(meetingID, userID) VALUES($1, $2)`,
+				meeting.ID, userID)
+			check(err)
+		}
+
+	}
+
+	// Add owner as participant
 	_, err = meetingplannerdb.Exec(
 		`INSERT INTO participants(meetingID, userID) VALUES($1, $2)`,
 		meeting.ID, meeting.OwnerID)
@@ -51,7 +69,11 @@ func createMeeting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 }
 
 // Accepts room name, topic, agenda, dateTime, (and participants TODO)
-// Only updates agenda if user not owner
+// Updates only the agenda if user not owner
+// Update participants:
+// - to add: add new participant to the array "participants": ["test4"]
+// - to remove: add existent participant to the array
+
 func updateMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 	var meeting = new(Meeting)
@@ -62,8 +84,10 @@ func updateMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Par
 	check(err)
 	userName := strings.Split(meetingCookie.Value, ":")[0]
 
+	// Get user id
 	err = meetingplannerdb.QueryRow(`SELECT id FROM users WHERE userName=$1`, userName).Scan(&userID)
 	check(err)
+
 	// Decode user passed data
 	err = json.NewDecoder(r.Body).Decode(&meeting)
 	check(err, "Decoding error")
@@ -71,9 +95,11 @@ func updateMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Par
 	// Get meeting id
 	meeting.ID, err = strconv.Atoi(params.ByName("id"))
 	check(err)
+
 	// Get owner id
 	err = meetingplannerdb.QueryRow(`SELECT ownerID FROM meetings WHERE id=$1`, meeting.ID).Scan(&meeting.OwnerID)
 	check(err)
+
 	// Find room associated with name
 	err = meetingplannerdb.QueryRow(`SELECT id FROM rooms WHERE name=$1`, meeting.RoomName).Scan(&meeting.RoomID)
 	check(err)
@@ -104,6 +130,55 @@ func updateMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Par
 				  id = $5`,
 			meeting.RoomID, meeting.Topic, meeting.Agenda, meeting.DateTime, meeting.ID)
 		check(err)
+
+		// Update participants
+		for _, username := range meeting.ParticipantNames {
+			var participantID int
+			var errScan int
+
+			// Find participantID
+			err = meetingplannerdb.QueryRow(`SELECT id FROM users WHERE username=$1`, username).Scan(&participantID)
+			check(err)
+
+			// Find user in participants
+			err = meetingplannerdb.QueryRow(`SELECT id FROM participants WHERE userID=$1 AND meetingID=$2`, participantID, meeting.ID).Scan(&errScan)
+
+			// Check error
+			if err != nil {
+
+				// Check user not in participants
+				if err == sql.ErrNoRows {
+
+					// Cannot add self as participant
+					if participantID != meeting.OwnerID {
+
+						// Add user
+						_, err = meetingplannerdb.Exec(
+							`INSERT INTO participants(meetingID, userID) VALUES($1, $2)`,
+							meeting.ID, participantID)
+						check(err)
+					}
+
+				} else {
+					check(err)
+				}
+
+				// User is already in participants
+			} else {
+
+				// Cannot remove self from participants
+				if participantID != meeting.OwnerID {
+
+					// Remove user
+					_, err = meetingplannerdb.Exec(
+						`DELETE FROM participants
+						WHERE meetingID = $1 AND userID = $2`,
+						meeting.ID, participantID)
+					check(err)
+				}
+
+			}
+		}
 
 	}
 }

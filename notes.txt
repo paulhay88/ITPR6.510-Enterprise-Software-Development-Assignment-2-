@@ -146,7 +146,7 @@ Kassian
 - Ability to see and update participants
 
 - Add participants
-- Create room if roomname does not exist
+- Create rooms
 - Add tests
 
 - Add run down of every route with all possible inputs
