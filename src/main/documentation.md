@@ -104,6 +104,17 @@ We have chosen to use the negroni package to handle the authentication of the Co
 
 ### /agendaSearch GET request
 
+## AgendaSearch GET request
+### /AgendaSearch?sentence=var1
+
+### /AgendaSearch?phoneNumber=var1
+
+### /AgendaSearch?email=var1
+
+### /AgendaSearch?keyWords=var1,var2,var3
+
+### /AgendaSearch?dollar=var1
+
 - Discuss features of the MeetingPlanner that are candidates to be executed on the client
 side instead of on the server. Clearly describe the pros and cons.
 
@@ -155,6 +166,7 @@ To test our Database we have a set of randomly generated text behind Keywords in
 
 - The enterprise typically hosts a variety of operating systems and internet browsers.
 Discuss how your solution copes with this variety.
+1. API dont need to worry :D 
 
 
 - Provide a "Quick Start Guide" outlining the steps and details required to install your
@@ -182,3 +194,4 @@ application on a new server.
 
 - Provide a document that lists the additional specifications that were missing but
 required to implement your solution.
+

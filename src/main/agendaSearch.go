@@ -9,23 +9,25 @@ import (
 )
 
 func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Params) {
-	var values []interface{}
+	//var values []interface{}
 	var myMeetings Meetings
 	var counter int
 	var searchString string
 	for _, k := range []string{"sentence", "phoneNumber", "email", "keyWords", "dollar"} {
 		if v, err := r.URL.Query()[k]; err {
 			counter++
-			var value interface{}
+			//var value interface{}
 			if k == "sentence" {
 				searchString = v[0]
-				p1 := `(^\b`
+				p1 := `(^`
 				p2 := searchString
-				p3 := `)?`
+				p3 := `)`
 				p4 := `(\_[a-zA-Z0-9]+)?`
 				newA := []string{p1, p2, p3, p4}
 				AnotherOne := strings.Join(newA, "")
-				results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE agenda ~* $1", AnotherOne)
+
+				results, err := meetingplannerdb.Query(`SELECT * FROM meetings WHERE agenda ~* $1`, AnotherOne)
+
 				check(err)
 				for results.Next() {
 					var meeting Meeting
@@ -34,16 +36,18 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 					myMeetings.Meetings = append(myMeetings.Meetings, meeting)
 				}
 				output(w, myMeetings)
+				//fmt.Println(myMeetings)
 			} else if k == "phoneNumber" {
-				searchString = v[1]
+				searchString = v[0]
 				p0 := `([a-zA-Z0-9\s\.\-]+)?`
 				p1 := `(`
 				p2 := searchString
-				p3 := `)?`
+				p3 := `)`
 				p4 := `([a-zA-Z0-9\s\.\-]+)?`
 				newA := []string{p0, p1, p2, p3, p4}
 				AnotherOne := strings.Join(newA, "")
-				results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE agenda ~* $1", AnotherOne)
+				fmt.Println(AnotherOne)
+				results, err := meetingplannerdb.Query(`SELECT * FROM meetings WHERE agenda ~* $1`, AnotherOne)
 				check(err)
 				for results.Next() {
 					var meeting Meeting
@@ -53,12 +57,12 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 				}
 				output(w, myMeetings)
 			} else if k == "email" {
-				searchString = v[1]
-				p0 := `([a-zA-Z0-9\s\-\.]+)(\s)`
+				searchString = v[0]
+				p0 := `([a-zA-Z0-9\s\-\.]+)(\s)?`
 				p1 := `(`
 				p2 := searchString
-				p3 := `)?`
-				p4 := `(\@)?([a-zA-Z]+)?(\.)?(com|au|co.nz)?([a-zA-Z0-9\s\-\.]+)`
+				p3 := `)`
+				p4 := `(\@)?([a-zA-Z]+)?(\.)?(com|au|co.nz)?([a-zA-Z0-9\s\-\.]+)?`
 				newA := []string{p0, p1, p2, p3, p4}
 				AnotherOne := strings.Join(newA, "")
 				results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE agenda ~* $1", AnotherOne)
@@ -83,7 +87,7 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 				p5 := k3
 				p6 := `)`
 				p7 := `|`
-				newA := []string{p0, p1, p2, p3, p4, p5, p6, p7, p0, p3, p2, p5, p4, p1, p6, p7, p0, p5, p2, p1, p4, p3, p6}
+				newA := []string{ /*123*/ p0, p1, p2, p3, p4, p5, p6, p7 /*132*/, p0, p1, p2, p5, p4, p3, p6, p7 /*231*/, p0, p3, p2, p5, p4, p1, p6, p7 /*213*/, p0, p3, p2, p1, p4, p5, p6, p7 /*312*/, p0, p5, p2, p1, p4, p3, p6, p7 /*321*/, p0, p5, p2, p1, p4, p3, p6}
 				AnotherOne := strings.Join(newA, "")
 				results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE agenda ~* $1", AnotherOne)
 				check(err)
@@ -95,14 +99,18 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 				}
 				output(w, myMeetings)
 			} else if k == "dollar" {
-				searchString = v[1]
-				p1 := `([a-zA-z0-9\n\.\s\-])+(\\`
-				p2 := searchString
-				p3 := `\b)([a-zA-z0-9\n\.\s\-])+`
+				searchString = v[0]
 
-				newA := []string{p1, p2, p3}
-				fmt.Println(newA)
+				p1 := `([a-zA-z0-9\n\.\s\-\@`
+				p1a := `\`
+				p2 := `\"\,\$])+(\$)?(`
+				p2a := `\`
+				p2b := searchString
+				p3 := `)([a-zA-z0-9\n\.\s\-\@\'\"\,\$])+`
+
+				newA := []string{p1, p2, p2a, p3}
 				AnotherOne := strings.Join(newA, "")
+				fmt.Println(AnotherOne)
 				results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE agenda ~* $1", AnotherOne)
 				check(err)
 				for results.Next() {
@@ -112,18 +120,9 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 					myMeetings.Meetings = append(myMeetings.Meetings, meeting)
 				}
 				output(w, myMeetings)
-				//regExpression = `([a-zA-Z0-9\ \-\.\n]+)(\ )(\$[0-9\.]+)(\ )([a-zA-Z\ \-\.\n]+)`
-			} else {
-				value = v[0]
 			}
-			values = append(values, value)
-
-		}
-		if len(values) == 0 {
-			http.Redirect(w, r, "/", http.StatusFound)
 			return
 		}
 
 	}
-
 }

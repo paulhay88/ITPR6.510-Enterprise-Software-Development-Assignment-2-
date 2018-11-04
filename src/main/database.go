@@ -229,7 +229,12 @@ func seed(db *sql.DB) {
 		participants(meetingID, userID) VALUES(
 			$1, $2)`, i, i)
 		check(err)
+
 	}
+	_, err = tx.Exec(`INSERT INTO
+		meetings(topic, dateAndTime, agenda, roomID, ownerID) VALUES(
+			$1, $2, $3, $4, $5)`, "TEST1", "2001-09-28 01:00", "AGENDA_Testing words paulD@eit.co.nz phone number 844-7575 then some other words cat bat mat then find some dolla values $4.50 than some other stuff", 1, 1)
+	check(err)
 
 	tx.Commit()
 }
