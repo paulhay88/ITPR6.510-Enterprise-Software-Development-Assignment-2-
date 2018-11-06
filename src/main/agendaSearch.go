@@ -108,7 +108,7 @@ func agendaSearch(w http.ResponseWriter, r *http.Request, Params httprouter.Para
 				p2b := searchString
 				p3 := `)([a-zA-z0-9\n\.\s\-\@\'\"\,\$])+`
 
-				newA := []string{p1, p2, p2a, p3}
+				newA := []string{p1, p1a, p2, p2a, p2b, p3}
 				AnotherOne := strings.Join(newA, "")
 				fmt.Println(AnotherOne)
 				results, err := meetingplannerdb.Query("SELECT * FROM meetings WHERE agenda ~* $1", AnotherOne)

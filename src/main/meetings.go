@@ -10,7 +10,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// Accepts date, room name, topic, and agenda (TODO participants)
+// Accepts date, room name, topic, agenda, and participants
 // dateTime format: "2012-09-04 14:32"
 func createMeeting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
@@ -68,7 +68,7 @@ func createMeeting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 
 }
 
-// Accepts room name, topic, agenda, dateTime, (and participants TODO)
+// Accepts room name, topic, agenda, dateTime, and participants
 // Updates only the agenda if user not owner
 // Update participants:
 // - to add: add new participant to the array "participants": ["test4"]
@@ -107,7 +107,6 @@ func updateMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Par
 	// Check if user is owner
 	if meeting.OwnerID != userID {
 
-		output(w, meeting.OwnerID)
 		// Not owner, only update agenda
 		_, err = meetingplannerdb.Exec(
 			`UPDATE meetings

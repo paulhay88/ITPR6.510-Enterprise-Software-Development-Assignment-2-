@@ -45,7 +45,11 @@ func route() {
 	//AgendaSearch
 	router.GET("/agendaSearch", agendaSearch)
 
-	// Users
+	// Rooms
+	router.GET("/rooms", getRooms)
+	router.POST("/rooms/create", createRoom)
+	router.PUT("/rooms/:id/edit", updateRoom)
+	router.DELETE("/rooms/:id/delete", deleteRoom)
 
 	// User settings
 	router.GET("/users/:id/settings", getUserSettings)

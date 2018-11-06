@@ -96,7 +96,6 @@ func queryMeetings(w http.ResponseWriter, r *http.Request, params httprouter.Par
 			var value interface{}
 
 			if k == "roomName" {
-				fmt.Println(k)
 				_ = meetingplannerdb.QueryRow("SELECT id FROM rooms WHERE name=$1", v[0]).Scan(&value)
 				k = "roomID"
 			} else if k == "ownerName" {
@@ -121,10 +120,17 @@ func queryMeetings(w http.ResponseWriter, r *http.Request, params httprouter.Par
 
 	for results.Next() {
 		var meeting Meeting
+		var isUserParticipant int
 		err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.DateTime, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
 		check(err)
 
-		meetings.Meetings = append(meetings.Meetings, meeting)
+		// Check if user participant
+		err = meetingplannerdb.QueryRow("SELECT id FROM participants WHERE meetingID=$1", meeting.ID).Scan(&isUserParticipant)
+
+		if err != sql.ErrNoRows {
+			check(err)
+			meetings.Meetings = append(meetings.Meetings, meeting)
+		}
 	}
 
 	output(w, meetings)

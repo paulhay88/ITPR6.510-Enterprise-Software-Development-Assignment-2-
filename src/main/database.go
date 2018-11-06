@@ -206,6 +206,12 @@ func seed(db *sql.DB) {
 			$1, $2, $3, $4, $5)`, "NAME_"+randStr(10), "test"+strconv.Itoa(i), "PHONE_"+randStr(10), "EMAIL_"+randStr(10), "password"+strconv.Itoa(i))
 		check(err)
 
+		// Admin
+		_, err = tx.Exec(`INSERT INTO 
+		users(name, userName, phone, email, password) VALUES(
+			$1, $2, $3, $4, $5)`, "admin", "admin", "PHONE_"+randStr(10), "EMAIL_"+randStr(10), "admin")
+		check(err)
+
 		// Rooms seed
 		_, err = tx.Exec(`INSERT INTO
 		rooms(name) VALUES(

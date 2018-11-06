@@ -145,7 +145,6 @@ Kassian
 - User settings
 - Ability to see and update participants
 
-- Add participants
 - Create rooms
 - Add tests
 
