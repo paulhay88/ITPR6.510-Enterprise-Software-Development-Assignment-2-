@@ -2,7 +2,7 @@
 
 ---
 
-- Routing options. Available routes and accepted input such as POST.
+# Routing options. Available routes and accepted input such as POST.
 ## Login 
 ### /login POST request
 1. To Access the database a user must log in with credentials to be able to return data after which all data is verified by the users Cookie.
@@ -53,11 +53,7 @@ We have chosen to use the negroni package to handle the authentication of the Co
 3. The UserName is taken from the Cookie from the first variable split by ":"
 4. A query is then constructed based on that name to get the userID
 5. Error check
-<<<<<<< HEAD
 6. Another query is then launched based on the participantâ€™s userID called participants
-=======
-6. Another query is then launched based on the participant’s userID called participants
->>>>>>> 1cb88462e84162a5ae1a2b0227b2c52c53e97a1e
 7. Error check the return
 8. Participants is then scanned to an error check
 9. A new query is launched based on the meetingID
@@ -106,15 +102,12 @@ We have chosen to use the negroni package to handle the authentication of the Co
 
 ### /users/:id/settings/delete DLETE request
 
-<<<<<<< HEAD
 
 ## Rooms
 ### /rooms/create POST request
 
 ### /rooms/edit PUT request
 
-=======
->>>>>>> 1cb88462e84162a5ae1a2b0227b2c52c53e97a1e
 ## AgendaSearch GET request
 The Agenda search is a Function that uses RegEx to search through the database and check to see if there is valid data that matches the regular expression.
 ### /AgendaSearch?sentence=var1
@@ -147,13 +140,11 @@ What this does is goes through the database and matches up any agenda which has 
 ### /AgendaSearch?dollar=var1
 Sample input: localhost:9090/dollar=$4.50
 
-- Discuss features of the MeetingPlanner that are candidates to be executed on the client
-side instead of on the server. Clearly describe the pros and cons.
+# Discuss features of the MeetingPlanner that are candidates to be executed on the client side instead of on the server. Clearly describe the pros and cons.
 
 ################################## haven't done this part YET!!!!!! 
 
-- All persistent data (bookings, user accounts, etc.) are to be stored in a PostgreSQL
-database. Explain the design choices you made to interact with the database.
+# All persistent data (bookings, user accounts, etc.) are to be stored in a PostgreSQL database. Explain the design choices you made to interact with the database.
 ## Database Model
 ### Object Based Data Model
 In our Database we have 5 Tables to represent the entire structure of our application.
@@ -175,11 +166,7 @@ rooms consists of only two attributes one is the PRIMARY KEY and the other is th
 1. id SERIAL PRIMARY KEY
 2. name VARCHAR(20)
 #### meetings
-<<<<<<< HEAD
-meetings is our most relational Table as it used by most functions to retrieve data. meetings is made up of 6 attributes, half of which are ID's. The reason for this was that it is a 'Meeting Planner Application' and needless to say 'meetings' are what itâ€™s about. The use of references in relation to the meetings makes the relationships easy to establish as every person has something to do with some meeting 'generally' speaking.
-=======
 meetings is our most relational Table as it used by most functions to retrieve data. meetings is made up of 6 attributes, half of which are ID's. The reason for this was that it is a 'Meeting Planner Application' and needless to say 'meetings' are what it’s about. The use of references in relation to the meetings makes the relationships easy to establish as every person has something to do with some meeting 'generally' speaking.
->>>>>>> 1cb88462e84162a5ae1a2b0227b2c52c53e97a1e
 1. id SERIAL PRIMARY KEY
 2. topic VARCHAR(20)
 3. dateAndTime TIMESTAMP 
@@ -201,14 +188,10 @@ To test our Database we have a set of randomly generated text behind Keywords in
 
 - The enterprise typically hosts a variety of operating systems and internet browsers.
 Discuss how your solution copes with this variety.
-<<<<<<< HEAD
-1. API donâ€™t need to worry :D 
-=======
 1. API don’t need to worry :D 
->>>>>>> 1cb88462e84162a5ae1a2b0227b2c52c53e97a1e
 
-- Provide a "Quick Start Guide" outlining the steps and details required to install your
-Application on a new server.
+# Provide a "Quick Start Guide" outlining the steps and details required to install your Application on a new server.
+###### SampleDataStartsAtSeven
 1. Have a Database in place that matches the corresponding postgres dataset in the application in this case it is 
     postgres 
     user=postgres 
@@ -223,16 +206,70 @@ Application on a new server.
 7. Logging in as a "Test User"
 - Use a POST method
 - Use the URL localhost:9090/login
-- The formatting is in .json and so in the body of the request type:
+- The formatting is in .json and so in the body of the request type: 
+
+login
+
 {
     "userName": "Test1",
     "password": "Password1"
 }
 
-- Provide a document that lists the additional specifications that were missing but
-Required to implement your solution.
-<<<<<<< HEAD
+createUser
 
-=======
->>>>>>> 1cb88462e84162a5ae1a2b0227b2c52c53e97a1e
+{
+    "Name": "Paul",
+    "UserName": "PaulD",
+	"Phone": "123-4556",
+	"Email": "Paul@something.com",
+	"Password": "password1"
+}
 
+createMeeting
+
+{
+    "DateTime", "2001-09-28 01:00",
+    "RoomID": "1",
+    "Topic": "TestData",
+    "Agenda": "Test the Data with info 123-4567 Paul@something.com with some names to look for Sam Cam Tam ",
+    "OwnerID": "12",
+    "participants": {
+        "meetingID": "12",
+        "userID": "5"
+    }
+}
+
+updateMeeting
+
+{
+    "roomID": "1",
+    "topic": "ChangeTopic",
+    "agenda": "NewAgenda",
+    "dateAndTime": "3009-06-01 11:00"
+}
+
+updateParticpants
+
+{
+    "meetingID": "1",
+    "userID": "12, 1, 2"
+}
+
+# Provide a document that lists the additional specifications that were missing but Required to implement your solution.
+
+Assumptions we made 
+---
+
+
+- Our Parts
+## Team work
+Most of the inital work was done in unison and we worked as a team to talk through and code the base of our database; the connections and the structure of what we would later use as our features.
+This is where we decided to use a Negroni mux handler that was also the wrapper for our router. This also involved the basic set up of our router.go file.
+Along with the http pacakages we worked on the cookies and how to handle the autherised user.
+Database model was well worked out initially and a design of most files was sketched early with a few files coming later to handle request more specifically. The Structs for the database came alongside the database design and was enitially well thought out and later expanded as more requirements were realised.
+
+## Pauls
+AgendaSearch/RegEx
+
+Documentation/
+## Kass
