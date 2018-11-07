@@ -53,7 +53,11 @@ We have chosen to use the negroni package to handle the authentication of the Co
 3. The UserName is taken from the Cookie from the first variable split by ":"
 4. A query is then constructed based on that name to get the userID
 5. Error check
+<<<<<<< HEAD
 6. Another query is then launched based on the participantâ€™s userID called participants
+=======
+6. Another query is then launched based on the participant’s userID called participants
+>>>>>>> 1cb88462e84162a5ae1a2b0227b2c52c53e97a1e
 7. Error check the return
 8. Participants is then scanned to an error check
 9. A new query is launched based on the meetingID
@@ -102,12 +106,15 @@ We have chosen to use the negroni package to handle the authentication of the Co
 
 ### /users/:id/settings/delete DLETE request
 
+<<<<<<< HEAD
 
 ## Rooms
 ### /rooms/create POST request
 
 ### /rooms/edit PUT request
 
+=======
+>>>>>>> 1cb88462e84162a5ae1a2b0227b2c52c53e97a1e
 ## AgendaSearch GET request
 The Agenda search is a Function that uses RegEx to search through the database and check to see if there is valid data that matches the regular expression.
 ### /AgendaSearch?sentence=var1
@@ -168,7 +175,11 @@ rooms consists of only two attributes one is the PRIMARY KEY and the other is th
 1. id SERIAL PRIMARY KEY
 2. name VARCHAR(20)
 #### meetings
+<<<<<<< HEAD
 meetings is our most relational Table as it used by most functions to retrieve data. meetings is made up of 6 attributes, half of which are ID's. The reason for this was that it is a 'Meeting Planner Application' and needless to say 'meetings' are what itâ€™s about. The use of references in relation to the meetings makes the relationships easy to establish as every person has something to do with some meeting 'generally' speaking.
+=======
+meetings is our most relational Table as it used by most functions to retrieve data. meetings is made up of 6 attributes, half of which are ID's. The reason for this was that it is a 'Meeting Planner Application' and needless to say 'meetings' are what it’s about. The use of references in relation to the meetings makes the relationships easy to establish as every person has something to do with some meeting 'generally' speaking.
+>>>>>>> 1cb88462e84162a5ae1a2b0227b2c52c53e97a1e
 1. id SERIAL PRIMARY KEY
 2. topic VARCHAR(20)
 3. dateAndTime TIMESTAMP 
@@ -190,7 +201,11 @@ To test our Database we have a set of randomly generated text behind Keywords in
 
 - The enterprise typically hosts a variety of operating systems and internet browsers.
 Discuss how your solution copes with this variety.
+<<<<<<< HEAD
 1. API donâ€™t need to worry :D 
+=======
+1. API don’t need to worry :D 
+>>>>>>> 1cb88462e84162a5ae1a2b0227b2c52c53e97a1e
 
 - Provide a "Quick Start Guide" outlining the steps and details required to install your
 Application on a new server.
@@ -216,5 +231,8 @@ Application on a new server.
 
 - Provide a document that lists the additional specifications that were missing but
 Required to implement your solution.
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1cb88462e84162a5ae1a2b0227b2c52c53e97a1e
 
