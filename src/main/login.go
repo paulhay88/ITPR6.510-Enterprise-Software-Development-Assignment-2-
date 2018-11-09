@@ -41,6 +41,7 @@ func loggedIn(w http.ResponseWriter, r *http.Request, _ httprouter.Params) bool 
 	return false
 }
 
+// Sign up
 func createUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var user = new(User)
 	err := json.NewDecoder(r.Body).Decode(&user)

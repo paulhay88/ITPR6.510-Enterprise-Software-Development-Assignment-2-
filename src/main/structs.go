@@ -50,7 +50,7 @@ type Meeting struct {
 	DateTime string `json:"dateTime"`
 	// For decoding
 	ParticipantNames []string `json:"participants"`
-	RoomName         string
+	RoomName         string   `json:"roomName"`
 
 	// For conveniance storage
 	Participants []User

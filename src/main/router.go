@@ -29,8 +29,6 @@ func route() {
 	router.GET("/login", loginPage)
 	router.POST("/login", login)
 	router.GET("/logout", logout)
-	// router.GET("/login/:id", login)
-	// router.POST("/createUser/", createUser)
 
 	// Meetings
 	router.GET("/allMeetings", getMeetings)
@@ -52,10 +50,10 @@ func route() {
 	router.DELETE("/rooms/:id/delete", deleteRoom)
 
 	// User settings
-	router.GET("/users/:id/settings", getUserSettings)
-	router.POST("/users/:id/settings/create", createUserSettings)
-	router.PUT("/users/:id/settings/edit", updateUserSettings)
-	router.DELETE("/users/:id/settings/delete", deleteUserSettings)
+	router.GET("/users/settings", getUserSettings)
+	router.POST("/users/settings/create", createUserSettings)
+	router.PUT("/users/settings/edit", updateUserSettings)
+	router.DELETE("/users/settings/delete", deleteUserSettings)
 
 	// Testing
 	router.POST("/outputInput", outputInput)

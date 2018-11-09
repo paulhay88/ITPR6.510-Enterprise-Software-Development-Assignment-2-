@@ -28,7 +28,7 @@ func createMeeting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 	err = json.NewDecoder(r.Body).Decode(&meeting)
 	check(err)
 
-	// Find roomID
+	// Find roomName
 	err = meetingplannerdb.QueryRow(`SELECT id FROM rooms WHERE name=$1`, meeting.RoomName).Scan(&meeting.RoomID)
 	check(err)
 
@@ -203,7 +203,6 @@ func deleteMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Par
 
 		// Not owner
 		return
-
 	}
 
 	// Owner can delete
@@ -212,6 +211,21 @@ func deleteMeeting(w http.ResponseWriter, r *http.Request, params httprouter.Par
 			WHERE meetingID = $1`,
 		meeting.ID)
 	check(err)
+
+	var priorMeeting PriorMeeting
+
+	// Check if meeting is saved as setting
+	err = meetingplannerdb.QueryRow(`SELECT * FROM priorMeetings WHERE meetingID=$1`, meeting.ID).Scan(&priorMeeting)
+	if err != sql.ErrNoRows {
+		check(err)
+
+		// Delete setting
+		_, err = meetingplannerdb.Exec(
+			`DELETE FROM priorMeetings
+				WHERE meetingID = $1`,
+			meeting.ID)
+		check(err)
+	}
 
 	_, err = meetingplannerdb.Exec(
 		`DELETE FROM meetings

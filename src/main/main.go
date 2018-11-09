@@ -21,11 +21,9 @@ func check(err error, message ...string) {
 var meetingplannerdb *sql.DB
 
 func main() {
-	// defer profile.Start().Stop()
 
 	meetingplannerdb = openDatabase()
 
-	// Defer closing of database to end of main()
 	defer meetingplannerdb.Close()
 
 	createTables(meetingplannerdb)
@@ -33,9 +31,4 @@ func main() {
 	seed(meetingplannerdb)
 
 	route()
-
-	// routeLog()
-
-	// Display all data from all tables
-	testOverviews(meetingplannerdb)
 }

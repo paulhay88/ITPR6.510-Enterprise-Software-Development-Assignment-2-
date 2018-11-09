@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -14,8 +15,19 @@ func getUserSettings(w http.ResponseWriter, r *http.Request, params httprouter.P
 
 	var meeting Meeting
 
+	var userID int
+
+	// User updating meeting
+	meetingCookie, err := r.Cookie("authUser")
+	check(err)
+	userName := strings.Split(meetingCookie.Value, ":")[0]
+
+	// Get user id
+	err = meetingplannerdb.QueryRow(`SELECT id FROM users WHERE userName=$1`, userName).Scan(&userID)
+	check(err)
+
 	// Find priorMeeting connected to userID
-	priorMeetings, err := meetingplannerdb.Query(`SELECT * FROM priorMeetings WHERE userID=$1`, params.ByName("id"))
+	priorMeetings, err := meetingplannerdb.Query(`SELECT * FROM priorMeetings WHERE userID=$1`, userID)
 	check(err)
 
 	defer priorMeetings.Close()
@@ -48,7 +60,18 @@ func createUserSettings(w http.ResponseWriter, r *http.Request, params httproute
 
 	var priorMeeting = new(PriorMeeting)
 
-	priorMeetings, err := meetingplannerdb.Query(`SELECT * FROM priorMeetings WHERE userID=$1`, params.ByName("id"))
+	var userID int
+
+	// User updating meeting
+	meetingCookie, err := r.Cookie("authUser")
+	check(err)
+	userName := strings.Split(meetingCookie.Value, ":")[0]
+
+	// Get user id
+	err = meetingplannerdb.QueryRow(`SELECT id FROM users WHERE userName=$1`, userName).Scan(&userID)
+	check(err)
+
+	priorMeetings, err := meetingplannerdb.Query(`SELECT * FROM priorMeetings WHERE userID=$1`, userID)
 	check(err)
 
 	// Check if settings already exist. Update them if they do, create them if they don't.
@@ -63,7 +86,7 @@ func createUserSettings(w http.ResponseWriter, r *http.Request, params httproute
 
 		_, err = meetingplannerdb.Exec(
 			`INSERT INTO priorMeetings(meetingID, userID) VALUES($1, $2)`,
-			priorMeeting.MeetingID, params.ByName("id"))
+			priorMeeting.MeetingID, userID)
 	}
 
 	check(err)
@@ -73,7 +96,18 @@ func updateUserSettings(w http.ResponseWriter, r *http.Request, params httproute
 
 	var priorMeeting = new(PriorMeeting)
 
-	err := json.NewDecoder(r.Body).Decode(&priorMeeting)
+	var userID int
+
+	// User updating meeting
+	meetingCookie, err := r.Cookie("authUser")
+	check(err)
+	userName := strings.Split(meetingCookie.Value, ":")[0]
+
+	// Get user id
+	err = meetingplannerdb.QueryRow(`SELECT id FROM users WHERE userName=$1`, userName).Scan(&userID)
+	check(err)
+
+	err = json.NewDecoder(r.Body).Decode(&priorMeeting)
 	check(err, "error inserting")
 
 	_, err = meetingplannerdb.Exec(
@@ -81,15 +115,26 @@ func updateUserSettings(w http.ResponseWriter, r *http.Request, params httproute
 		 SET meetingID = $1
 		 WHERE
 		 	 id = $2`,
-		priorMeeting.MeetingID, params.ByName("id"))
+		priorMeeting.MeetingID, userID)
 	check(err)
 }
 
 func deleteUserSettings(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
-	_, err := meetingplannerdb.Exec(
+	var userID int
+
+	// User updating meeting
+	meetingCookie, err := r.Cookie("authUser")
+	check(err)
+	userName := strings.Split(meetingCookie.Value, ":")[0]
+
+	// Get user id
+	err = meetingplannerdb.QueryRow(`SELECT id FROM users WHERE userName=$1`, userName).Scan(&userID)
+	check(err)
+
+	_, err = meetingplannerdb.Exec(
 		`DELETE FROM priorMeetings
 		 WHERE userID = $1`,
-		params.ByName("id"))
+		userID)
 	check(err)
 }

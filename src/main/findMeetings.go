@@ -90,6 +90,16 @@ func queryMeetings(w http.ResponseWriter, r *http.Request, params httprouter.Par
 	var where []string
 	var counter int
 
+	var userID int
+
+	// Logged in user
+	meetingCookie, err := r.Cookie("authUser")
+	check(err)
+	userName := strings.Split(meetingCookie.Value, ":")[0]
+
+	err = meetingplannerdb.QueryRow(`SELECT id FROM users WHERE userName=$1`, userName).Scan(&userID)
+	check(err)
+
 	for _, k := range []string{"dateAndTime", "topic", "roomName", "ownerName"} {
 		if v, err := r.URL.Query()[k]; err {
 			counter++
@@ -124,11 +134,44 @@ func queryMeetings(w http.ResponseWriter, r *http.Request, params httprouter.Par
 		err := results.Scan(&meeting.ID, &meeting.Topic, &meeting.DateTime, &meeting.Agenda, &meeting.RoomID, &meeting.OwnerID)
 		check(err)
 
+		// Get room name
+		err = meetingplannerdb.QueryRow(`SELECT name FROM rooms WHERE id=$1`, meeting.RoomID).Scan(&meeting.RoomName)
+		check(err)
+
 		// Check if user participant
-		err = meetingplannerdb.QueryRow("SELECT id FROM participants WHERE meetingID=$1", meeting.ID).Scan(&isUserParticipant)
+		err = meetingplannerdb.QueryRow("SELECT id FROM participants WHERE meetingID=$1 AND userID=$2", meeting.ID, userID).Scan(&isUserParticipant)
 
 		if err != sql.ErrNoRows {
 			check(err)
+
+			// Get participants belonging to meeting
+			participants, err := meetingplannerdb.Query(`SELECT * FROM participants WHERE meetingID=$1`, meeting.ID)
+			check(err)
+			defer participants.Close()
+
+			for participants.Next() {
+
+				var participant Participant
+
+				err := participants.Scan(&participant.ID, &participant.MeetingID, &participant.UserID)
+				check(err)
+
+				// Get user associated with participants entry. Put this user in meetings.Participants
+				users, err := meetingplannerdb.Query(`SELECT * FROM users WHERE id=$1`, participant.UserID)
+				check(err)
+				defer users.Close()
+
+				for users.Next() {
+					var user User
+					var localPass string // keep password safe
+
+					err := users.Scan(&user.ID, &user.UserName, &user.Name, &user.Email, &user.Phone, &localPass)
+					check(err)
+
+					meeting.Participants = append(meeting.Participants, user)
+				}
+			}
+
 			meetings.Meetings = append(meetings.Meetings, meeting)
 		}
 	}

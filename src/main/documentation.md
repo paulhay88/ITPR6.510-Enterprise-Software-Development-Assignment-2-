@@ -74,9 +74,10 @@ We have chosen to use the negroni package to handle the authentication of the Co
 
 ### /meeting/:id/delete DELETE request
 1. This fires two Exec on the database.
-2. The first one DLETEs FOM participants WHERE the meetingID matched the variable.
-3. The second part DELETEs FROM meetings WHERE id matched the variable.
-4. Both are error checked.
+2. The first one DELETEs FROM participants WHERE the meetingID matched the variable.
+3. The second part DELETEs FROm settings if the meeting is also stored as a setting.
+4. The third part DELETEs FROM meetings WHERE id matched the variable.
+5. Both are error checked.
 
 ### /meetings GET request
 1. The Application starts by creating a few variables that need to be used.
@@ -94,19 +95,20 @@ We have chosen to use the negroni package to handle the authentication of the Co
 10. That data is then appended to a meetings.Meetings variable and then output.
 
 ## Users
-### /users/:id/settings GET request
-*Kass input
-### /users/:id/settings/create POST request
-*Kass input
-### /users/:id/settings/edit PUT request
-*Kass input
-### /users/:id/settings/delete DLETE request
-*Kass input
+### /users/settings GET request
+1. Gets the user ID of the logged in user.
+2. Retrieves the currently saved meeting with the logged in user ID.
+3. Outputs either a string saying "No settings saved." or the meeting
+### /users/settings/create POST request
+1. Uses the meeting id and user id of the logged in user to save a reference to a specific meeting.  This is saved as a setting.
+2. If a setting already exists it updates the setting.
+### /users/settings/edit PUT request
+1. Updates the saved setting.
+### /users/settings/delete DLETE request
+1. Deletes the setting.
+
 ## Rooms
-### /rooms/create POST request
-*Kass input
-### /rooms/edit PUT request
-*Kass input
+1. For the creation, modification, and deletion of rooms a special admin user has been created. Only that person will be able to make changes to the rooms table. However every other user is able to access a list of rooms.
 
 ## AgendaSearch GET request
 The Agenda search is a Function that uses RegEx to search through the database and check to see if there is valid data that matches the regular expression.
@@ -142,8 +144,7 @@ Sample input: localhost:9090/dollar=$4.50
 
 # Discuss features of the MeetingPlanner that are candidates to be executed on the client side instead of on the server. Clearly describe the pros and cons.
 
-################################## haven't done this part YET!!!!!! 
-*Kass input
+As the meeting planner is currently a restful API, client side features would include the layout of the information and the methods of entering information to be sent to the database.  This could include data validation before hitting the submit button to save the user time. An example of this could be disabling the submit button until the user has filled in all required fields. The positive of this is that the user will be reminded and won't waste time, however in the case of a long form the user might want to come back to a field later in which case it could be more of an annoyance than a help.
 
 
 # All persistent data (bookings, user accounts, etc.) are to be stored in a PostgreSQL database. Explain the design choices you made to interact with the database.
@@ -190,7 +191,7 @@ To test our Database we have a set of randomly generated text behind Keywords in
 
 - The enterprise typically hosts a variety of operating systems and internet browsers.
 Discuss how your solution copes with this variety.
-1. API don’t need to worry :D 
+1. Since our application is uses a RESTFUL API, as long as the correct format/protocol is applied it will consistently work the same accross all operating systems and internet browsers.
 
 # Provide a "Quick Start Guide" outlining the steps and details required to install your Application on a new server.
 ###### SampleDataStartsAtSeven
@@ -210,6 +211,7 @@ Discuss how your solution copes with this variety.
 - Use the URL localhost:9090/login
 - The formatting is in .json and so in the body of the request type: 
 
+POST
 login
 localhost:9090/login
 {
@@ -217,42 +219,63 @@ localhost:9090/login
     "password": "password1"
 }
 
+GET
+logout
+localhost:9090/logout
+
+GET
+login
+localhost:9090/login
+
+POST
 createUser
 localhost:9090/signup
 {
-    "Name": "Paul",
-    "UserName": "PaulD",
-	"Phone": "123-4556",
-	"Email": "Paul@something.com",
-	"Password": "password1"
+    "name": "Paul",
+    "userName": "PaulD",
+	"phone": "123-4556",
+	"email": "Paul@something.com",
+	"password": "password1"
 }
 
+POST
 createMeeting
 localhost:9090/meetings/create
 {
-    "DateTime", "2001-09-28 01:00",
-    "RoomID": "1",
-    "Topic": "TestData",
-    "Agenda": "Test the Data with info 123-4567 Paul@something.com with some names to look for Sam Cam Tam ",
-    "OwnerID": "12",
-    "participants": {
-        "meetingID": "12",
-        "userID": "5"
-    }
+    "dateTime", "2001-09-28 01:00",
+    "roomName": "test1",
+    "topic": "TestData",
+    "agenda": "Test the Data with info 123-4567 Paul@something.com with some names to look for Sam Cam Tam ",
+    "participants": [
+        "test1",
+        "test2"
+    ]
 }
 
-updateMeeting
-localhost:9090/mmeetings/1/edit
+PUT
+updateMeeting 
+(participants are either removed or added depending if they are or are not already a participant. Acts as a participant toggle.)
+localhost:9090/meetings/1/edit
 {
-    "roomID": "1",
-    "topic": "ChangeTopic",
-    "agenda": "NewAgenda",
-    "dateAndTime": "3009-06-01 11:00"
+    "dateTime", "2001-09-28 01:00",
+    "roomName": "test1",
+    "topic": "TestData",
+    "agenda": "Test the Data with info 123-4567 Paul@something.com with some names to look for Sam Cam Tam ",
+    "participants": [
+        "test1",
+        "test2"
+    ]
 }
 
+DELETE
 deleteMeeting
 localhost:9090/meetings/1/delete
 
+GET
+find meetings
+localhost:9090/meetings?dateAndTime=2001-09-28_01:00&topic=TOPIC_lgTeMaPEZQ&roomName=NAME_LDnJObCsNV&ownerName=NAME_XVlBzgbaiC
+
+GET
 agendaSearch
 localhost:9090/agendaSearch?sentence=AGENDA_Testing
 localhost:9090/agendaSearch?phoneNumber=844-7575
@@ -260,44 +283,49 @@ localhost:9090/agendaSearch?email=paulD@eit.co.nz
 localhost:9090/agendaSearch?keyWords=cat&keyWords=bat&keyWords=mat
 localhost:9090/agendaSearch?dollar=$4.50
 
+GET
 allRooms
 localhost:9090/rooms
 
+(note: must be logged in as admin to modify, create, or delete rooms. all users can view rooms.)
+
+POST
 createRoom
 localhost:9090/rooms/create
 {
-    "id": "1",
     "name": "TestRoom"
 }
 
+PUT
 editRoom
 localhost:9090/rooms/1/edit
 {
-    "name": "TestRoom 2",
-    "id": "1"
+    "name": "TestRoom 2"
 }
 
+DELETE
 deleteRoom
 localhost:9090/rooms/1/delete
-{
-    "id": "1"
-}
 
+GET
 userSettings
 localhost:9090/users/1/settings
 
+POST
 createUserSettings
 localhost:9090/users/1/settings/create
 {
     "meetingID": "1"
 }
 
+PUT
 updateUserSettings
 localhost:9090/users/1/settings/edit
 {
     "meetingID": "2"
 }
 
+DELETE
 deleteUserSettings
 localhost:9090/users/1/settings/delete
 
@@ -306,28 +334,35 @@ localhost:9090/users/1/settings/delete
 
 Assumptions we made 
 ---
-database layout
-structs 
+database layout (pivot tables)
+structs (how structs would be used to decode json format)
 id's 
 keys
-routing type
-input types
-output layout
-
-
+routing type (methods)
+input types (room name vs room ID)
+output layout (such as what would be included when getting meetings)
+creation flow (such as how rooms would be created)
 
 - Our Parts
 ## Team work
 Most of the inital work was done in unison and we worked as a team to talk through and code the base of our database; the connections and the structure of what we would later use as our features.
 This is where we decided to use a Negroni mux handler that was also the wrapper for our router. This also involved the basic set up of our router.go file.
-Along with the http pacakages we worked on the cookies and how to handle the autherised user.
-Database model was well worked out initially and a design of most files was sketched early with a few files coming later to handle request more specifically. The Structs for the database came alongside the database design and was enitially well thought out and later expanded as more requirements were realised.
+Along with the http packages we worked on the cookies and how to handle the autherised user.
+Database model was well worked out initially and a design of most files was sketched early with a few files coming later to handle request more specifically. The Structs for the database came alongside the database design and was initially well thought out and later expanded as more requirements were realised.
 
-*Kass input
+Working in unison made problem solving a more creative task as we could collaboratively share ideas which would bring us further.  Often times one of us would have an idea that would help the other even if the task was originally dedicated to one person.
 
 ## Pauls
 AgendaSearch/RegEx
-
+Structs
 Documentation/
+
 ## Kass
-*Kass input
+meetings
+findMeetings
+userSettings
+
+## Together
+database including layout, pivot tables, naming conventions
+authentication (Paul started with login, Kassian added negroni middleware)
+router (ad hoc)
