@@ -95,18 +95,18 @@ We have chosen to use the negroni package to handle the authentication of the Co
 
 ## Users
 ### /users/:id/settings GET request
-
+*Kass input
 ### /users/:id/settings/create POST request
-
+*Kass input
 ### /users/:id/settings/edit PUT request
-
+*Kass input
 ### /users/:id/settings/delete DLETE request
-
-
+*Kass input
 ## Rooms
 ### /rooms/create POST request
-
+*Kass input
 ### /rooms/edit PUT request
+*Kass input
 
 ## AgendaSearch GET request
 The Agenda search is a Function that uses RegEx to search through the database and check to see if there is valid data that matches the regular expression.
@@ -143,6 +143,8 @@ Sample input: localhost:9090/dollar=$4.50
 # Discuss features of the MeetingPlanner that are candidates to be executed on the client side instead of on the server. Clearly describe the pros and cons.
 
 ################################## haven't done this part YET!!!!!! 
+*Kass input
+
 
 # All persistent data (bookings, user accounts, etc.) are to be stored in a PostgreSQL database. Explain the design choices you made to interact with the database.
 ## Database Model
@@ -209,14 +211,14 @@ Discuss how your solution copes with this variety.
 - The formatting is in .json and so in the body of the request type: 
 
 login
-
+localhost:9090/login
 {
-    "userName": "Test1",
-    "password": "Password1"
+    "userName": "test1",
+    "password": "password1"
 }
 
 createUser
-
+localhost:9090/signup
 {
     "Name": "Paul",
     "UserName": "PaulD",
@@ -226,7 +228,7 @@ createUser
 }
 
 createMeeting
-
+localhost:9090/meetings/create
 {
     "DateTime", "2001-09-28 01:00",
     "RoomID": "1",
@@ -240,7 +242,7 @@ createMeeting
 }
 
 updateMeeting
-
+localhost:9090/mmeetings/1/edit
 {
     "roomID": "1",
     "topic": "ChangeTopic",
@@ -248,17 +250,70 @@ updateMeeting
     "dateAndTime": "3009-06-01 11:00"
 }
 
-updateParticpants
+deleteMeeting
+localhost:9090/meetings/1/delete
 
+agendaSearch
+localhost:9090/agendaSearch?sentence=AGENDA_Testing
+localhost:9090/agendaSearch?phoneNumber=844-7575
+localhost:9090/agendaSearch?email=paulD@eit.co.nz
+localhost:9090/agendaSearch?keyWords=cat&keyWords=bat&keyWords=mat
+localhost:9090/agendaSearch?dollar=$4.50
+
+allRooms
+localhost:9090/rooms
+
+createRoom
+localhost:9090/rooms/create
 {
-    "meetingID": "1",
-    "userID": "12, 1, 2"
+    "id": "1",
+    "name": "TestRoom"
 }
+
+editRoom
+localhost:9090/rooms/1/edit
+{
+    "name": "TestRoom 2",
+    "id": "1"
+}
+
+deleteRoom
+localhost:9090/rooms/1/delete
+{
+    "id": "1"
+}
+
+userSettings
+localhost:9090/users/1/settings
+
+createUserSettings
+localhost:9090/users/1/settings/create
+{
+    "meetingID": "1"
+}
+
+updateUserSettings
+localhost:9090/users/1/settings/edit
+{
+    "meetingID": "2"
+}
+
+deleteUserSettings
+localhost:9090/users/1/settings/delete
+
 
 # Provide a document that lists the additional specifications that were missing but Required to implement your solution.
 
 Assumptions we made 
 ---
+database layout
+structs 
+id's 
+keys
+routing type
+input types
+output layout
+
 
 
 - Our Parts
@@ -268,8 +323,11 @@ This is where we decided to use a Negroni mux handler that was also the wrapper 
 Along with the http pacakages we worked on the cookies and how to handle the autherised user.
 Database model was well worked out initially and a design of most files was sketched early with a few files coming later to handle request more specifically. The Structs for the database came alongside the database design and was enitially well thought out and later expanded as more requirements were realised.
 
+*Kass input
+
 ## Pauls
 AgendaSearch/RegEx
 
 Documentation/
 ## Kass
+*Kass input
