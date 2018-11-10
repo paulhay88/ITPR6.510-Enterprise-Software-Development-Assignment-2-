@@ -201,12 +201,15 @@ Discuss how your solution copes with this variety.
     password=password 
     dbname=meetingplannerdb 
     sslmode=disable
-2. Open a CMD window by typing cmd.exe into the search portion of the Windows screen and navigate to the file location.
-3. Run the following command in the 'main' folder: go install main
-4. Followed by: main.exe
-5. Install RESTer on your Browser (preferably Chrome)
-6. Open RESTer to Test the Application
-7. Logging in as a "Test User"
+2. External Packages
+- https://github.com/urfave/negroni
+- https://github.com/julienschmidt/httprouter
+3. Open a CMD window by typing cmd.exe into the search portion of the Windows screen and navigate to the file location.
+4. Run the following command in the 'main' folder: go install main
+5. Followed by: main
+6. Install RESTer on your Browser (preferably Chrome)
+7. Open RESTer to Test the Application
+8. Logging in as a "Test User"
 - Use a POST method
 - Use the URL localhost:9090/login
 - The formatting is in .json and so in the body of the request type: 
